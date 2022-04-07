@@ -51,20 +51,18 @@ public class AppUser implements UserDetails {
     @Column(nullable = false)
     private String email;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
-
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
-    @Column(nullable = false)
-    private Boolean locked = false;
+    @Column(name = "is_blocked", nullable = false)
+    private Boolean blocked = false;
 
-    @Column(nullable = false)
+    @Column(name = "is_enabled", nullable = false)
     private Boolean enabled = false;
 
 //    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private AppUserRole appUserRole;
 
     @OneToMany(
@@ -89,15 +87,6 @@ public class AppUser implements UserDetails {
         this.email = email;
         this.appUserRole = appUserRole;
         this.imageUrl = String.format("some_url/%s", username);
-    }
-
-//    delete
-    public AppUser(String username, String password, String email, boolean isActive, String imageUrl) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.isActive = isActive;
-        this.imageUrl = imageUrl;
     }
 
     public void addSpace(Space space) {
@@ -129,9 +118,6 @@ public class AppUser implements UserDetails {
         return "AppUser{" +
                 "username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", is_active=" + isActive +
-                ", locked=" + locked +
-                ", enabled=" + enabled +
                 ", role=" + appUserRole +
                 '}';
     }
@@ -150,7 +136,7 @@ public class AppUser implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !locked;
+        return !blocked;
     }
 
     @Override

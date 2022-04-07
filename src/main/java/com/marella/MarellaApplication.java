@@ -39,22 +39,22 @@ public class MarellaApplication {
     }
 
     private void debug(AppUserRepository appUserRepository, SpaceRepository spaceRepository) {
-        AppUser maria = new AppUser(
-                "maria",
-                "maria",
-                "maria@gmail.com",
-                true,
-                "maria.ru"
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        AppUser user = new AppUser(
+                "semen",
+                bCryptPasswordEncoder.encode("semen"),
+                "larkinsemen@gmail.com",
+                AppUserRole.USER
         );
         Space space = new Space("first_space", true, new GregorianCalendar());
         Tag tag = new Tag("treasury");
-        Permission permission = new Permission(maria, space);
+        Permission permission = new Permission(user, space);
 //            space.addTag(tag);
-        maria.addSpace(space);
-        maria.addPermission(permission);
-        appUserRepository.save(maria);
+        user.addSpace(space);
+        user.addPermission(permission);
+        appUserRepository.save(user);
         space.addTag(tag);
-        appUserRepository.save(maria);
+        appUserRepository.save(user);
 //            При взятии данных из таблицы при работе с объектом все зависимости видны
 //            При отключениии FetchType.EAGER на FetchType.LAZY работать перестанет
         appUserRepository.findById(1L).ifPresent(
@@ -67,23 +67,23 @@ public class MarellaApplication {
                     System.out.println(u.getPermissions());
                 }
         );
-//            При работе с начальными объектами для maria зависимости есть
-//            Для space - нет, т.к. сохранение производилось только в объект maria
-        System.out.println(maria.getPermissions());
+//            При работе с начальными объектами для user зависимости есть
+//            Для space - нет, т.к. сохранение производилось только в объект user
+        System.out.println(user.getPermissions());
         System.out.println(space.getPermissions());
 
 
-//            userRepository.delete(maria);
-//            userRepository.save(maria);
+//            userRepository.delete(user);
+//            userRepository.save(user);
 
 //            userRepository.deleteById(1L);
 //            userRepository.save(new SiteUser(
-//                    "maria",
-//                    "maria",
-//                    "maria@gmail.com",
+//                    "user",
+//                    "user",
+//                    "user@gmail.com",
 //                    true,
 //                    false,
-//                    "maria.ru"
+//                    "user.ru"
 //            ));
     }
 }
