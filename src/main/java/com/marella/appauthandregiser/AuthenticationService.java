@@ -20,6 +20,7 @@ public class AuthenticationService {
     public String registration(RegistrationRequest request) {
         String response = appUserService.signUp(request.getEmail(), request.getUsername(), request.getPassword());
         //        Метод не закончен, не тестировать
+        //
         return "";
     }
 }
