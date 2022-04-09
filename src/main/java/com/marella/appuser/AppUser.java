@@ -23,7 +23,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @NoArgsConstructor
 @Entity(name = "Site_user")
 @Table(
-        name = "site_users",
+        name = "site_user",
         uniqueConstraints = {
                 @UniqueConstraint(name = "user_email_unique", columnNames = "email"),
                 @UniqueConstraint(name = "user_username_unique", columnNames = "username")
