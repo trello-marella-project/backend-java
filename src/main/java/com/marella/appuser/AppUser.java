@@ -1,7 +1,7 @@
 package com.marella.appuser;
 
-import com.marella.javaObjectClasses.Permission;
-import com.marella.javaObjectClasses.Space;
+import com.marella.javaobjectclasses.Permission;
+import com.marella.javaobjectclasses.Space;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

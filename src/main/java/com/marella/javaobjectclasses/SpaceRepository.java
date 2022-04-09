@@ -1,4 +1,4 @@
-package com.marella.javaObjectClasses;
+package com.marella.javaobjectclasses;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

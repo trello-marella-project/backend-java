@@ -1,4 +1,4 @@
-package com.marella.javaObjectClasses;
+package com.marella.javaobjectclasses;
 
 import com.marella.appuser.AppUser;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @Entity(name = "Permission")
-@Table(name = "permission_log")
+@Table(name = "permission")
 public class Permission {
     @EmbeddedId
     private PermissionId id;

@@ -1,4 +1,4 @@
-package com.marella.javaObjectClasses;
+package com.marella.javaobjectclasses;
 
 import com.marella.appuser.AppUser;
 import lombok.Getter;
@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import static javax.persistence.GenerationType.SEQUENCE;
@@ -39,11 +38,6 @@ public class Space {
             nullable = false
     )
     private boolean isPublic;
-
-    @Column(
-            nullable = false
-    )
-    private GregorianCalendar lastChange;
 
     @ManyToOne
     @JoinColumn(
@@ -80,10 +74,9 @@ public class Space {
     )
     private List<Block> blocks = new ArrayList<>();
 
-    public Space(String name, boolean isPublic, GregorianCalendar lastChange) {
+    public Space(String name, boolean isPublic) {
         this.name = name;
         this.isPublic = isPublic;
-        this.lastChange = lastChange;
     }
 
     public void addPermission(Permission permission) {
@@ -130,7 +123,6 @@ public class Space {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", isPublic=" + isPublic +
-                ", lastChange=" + lastChange.getTime() +
                 ", user=" + user +
                 '}';
     }

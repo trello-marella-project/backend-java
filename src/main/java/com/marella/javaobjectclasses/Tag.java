@@ -1,4 +1,4 @@
-package com.marella.javaObjectClasses;
+package com.marella.javaobjectclasses;
 
 
 import lombok.Getter;
@@ -13,7 +13,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Setter
 @NoArgsConstructor
 @Entity(name = "Tag")
-@Table(name = "tag_log")
+@Table(name = "tag")
 public class Tag {
     @Id
     @SequenceGenerator(
@@ -28,7 +28,7 @@ public class Tag {
     private Long id;
 
     @Column(nullable = false)
-    private String tag;
+    private String name;
 
     @ManyToOne
     @JoinColumn(
@@ -41,15 +41,15 @@ public class Tag {
     )
     private Space space;
 
-    public Tag(String tag) {
-        this.tag = tag;
+    public Tag(String name) {
+        this.name = name;
     }
 
     @Override
     public String toString() {
         return "Tag{" +
                 "id=" + id +
-                ", tag='" + tag + '\'' +
+                ", name='" + name + '\'' +
                 ", space=" + space +
                 '}';
     }

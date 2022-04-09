@@ -1,4 +1,4 @@
-package com.marella.javaObjectClasses;
+package com.marella.javaobjectclasses;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Getter
 @NoArgsConstructor
 @Entity(name = "Block")
-@Table(name = "blocks")
+@Table(name = "block")
 public class Block {
     @Id
     @SequenceGenerator(

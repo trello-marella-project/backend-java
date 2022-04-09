@@ -1,4 +1,4 @@
-package com.marella.javaObjectClasses;
+package com.marella.javaobjectclasses;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Getter
 @NoArgsConstructor
 @Entity(name = "Card")
-@Table(name = "cards")
+@Table(name = "card")
 public class Card {
     @Id
     @SequenceGenerator(

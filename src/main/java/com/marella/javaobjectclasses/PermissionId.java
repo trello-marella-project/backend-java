@@ -1,4 +1,4 @@
-package com.marella.javaObjectClasses;
+package com.marella.javaobjectclasses;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -8,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
-import java.util.Objects;
 
 @Getter
 @Setter

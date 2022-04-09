@@ -3,14 +3,12 @@ package com.marella;
 import com.marella.appuser.AppUser;
 import com.marella.appuser.AppUserRepository;
 import com.marella.appuser.AppUserRole;
-import com.marella.javaObjectClasses.*;
+import com.marella.javaobjectclasses.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.util.GregorianCalendar;
 
 @SpringBootApplication
 public class MarellaApplication {
@@ -46,7 +44,7 @@ public class MarellaApplication {
                 "larkinsemen@gmail.com",
                 AppUserRole.USER
         );
-        Space space = new Space("first_space", true, new GregorianCalendar());
+        Space space = new Space("first_space", true);
         Tag tag = new Tag("treasury");
         Permission permission = new Permission(user, space);
 //            space.addTag(tag);
