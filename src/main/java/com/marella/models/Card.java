@@ -1,5 +1,4 @@
-package com.marella.javaobjectclasses;
-
+package com.marella.models;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,26 +8,29 @@ import javax.persistence.*;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
-@Entity(name = "Tag")
-@Table(name = "tag")
-public class Tag {
+@Entity(name = "Card")
+@Table(name = "card")
+public class Card {
     @Id
     @SequenceGenerator(
-            name = "tag_sequence",
-            sequenceName = "tag_sequence",
+            name = "user_sequence",
+            sequenceName = "user_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = SEQUENCE,
-            generator = "tag_sequence"
+            generator = "user_sequence"
     )
     private Long id;
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String description;
 
     @ManyToOne
     @JoinColumn(
@@ -36,21 +38,18 @@ public class Tag {
             nullable = false,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(
-                    name = "space_id_fk"
+                    name = "block_id_fk"
             )
     )
-    private Space space;
-
-    public Tag(String name) {
-        this.name = name;
-    }
+    private Block block;
 
     @Override
     public String toString() {
-        return "Tag{" +
+        return "Card{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", space=" + space +
+                ", description='" + description + '\'' +
+                ", block=" + block +
                 '}';
     }
 }

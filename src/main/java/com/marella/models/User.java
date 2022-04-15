@@ -1,7 +1,5 @@
-package com.marella.appuser;
+package com.marella.models;
 
-import com.marella.javaobjectclasses.Permission;
-import com.marella.javaobjectclasses.Space;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,10 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -29,7 +24,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
                 @UniqueConstraint(name = "user_username_unique", columnNames = "username")
         }
 )
-public class AppUser implements UserDetails {
+public class User{
     @Id
     @SequenceGenerator(
             name = "user_sequence",
@@ -51,7 +46,7 @@ public class AppUser implements UserDetails {
     @Column(nullable = false)
     private String email;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url")
     private String imageUrl;
 
     @Column(name = "is_blocked", nullable = false)
@@ -61,15 +56,18 @@ public class AppUser implements UserDetails {
     private Boolean enabled = false;
 
 //    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private AppUserRole appUserRole;
+//    @Enumerated(EnumType.STRING)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(	name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(
             mappedBy = "user",
             orphanRemoval = true,
             cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
+            fetch = FetchType.LAZY
     )
     private List<Space> spaces = new ArrayList<>();
 
@@ -77,15 +75,21 @@ public class AppUser implements UserDetails {
             mappedBy = "user",
             orphanRemoval = true,
             cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
+            fetch = FetchType.LAZY
     )
     private List<Permission> permissions = new ArrayList<>();
 
-    public AppUser(String username, String password, String email, AppUserRole appUserRole) {
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String username, String password, String email, Set<Role> roles) {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.appUserRole = appUserRole;
+        this.roles = roles;
         this.imageUrl = String.format("some_url/%s", username);
     }
 
@@ -115,37 +119,37 @@ public class AppUser implements UserDetails {
 
     @Override
     public String toString() {
-        return "AppUser{" +
+        return "User{" +
                 "username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", role=" + appUserRole +
+                ", roles=" + roles +
                 '}';
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority =
-                new SimpleGrantedAuthority(appUserRole.name());
-        return Collections.singletonList(authority);
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !blocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        SimpleGrantedAuthority authority =
+//                new SimpleGrantedAuthority(roles.name());
+//        return Collections.singletonList(authority);
+//    }
+//
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return !blocked;
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isEnabled() {
+//        return enabled;
+//    }
 }

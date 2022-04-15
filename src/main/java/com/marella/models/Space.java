@@ -1,6 +1,5 @@
-package com.marella.javaobjectclasses;
+package com.marella.models;
 
-import com.marella.appuser.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,7 +47,7 @@ public class Space {
                     name = "user_id_fk"
             )
     )
-    private AppUser user;
+    private User user;
 
     @OneToMany(
             mappedBy = "space",

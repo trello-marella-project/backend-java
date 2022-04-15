@@ -1,4 +1,4 @@
-package com.marella.javaobjectclasses;
+package com.marella.models;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,14 +6,17 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Setter
 @Getter
 @NoArgsConstructor
-@Entity(name = "Card")
-@Table(name = "card")
-public class Card {
+@Entity(name = "Block")
+@Table(name = "block")
+public class Block {
     @Id
     @SequenceGenerator(
             name = "user_sequence",
@@ -29,27 +32,49 @@ public class Card {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String description;
-
     @ManyToOne
     @JoinColumn(
             name = "space_id",
             nullable = false,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(
-                    name = "block_id_fk"
+                    name = "space_id_fk"
             )
     )
-    private Block block;
+    private Space space;
+
+    @OneToMany(
+            mappedBy = "block",
+            orphanRemoval = true,
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Card> cards = new ArrayList<>();
+
+    public Block(String name) {
+        this.name = name;
+    }
+
+    public void addCard(Card card){
+        if(!cards.contains(card)){
+            cards.add(card);
+            card.setBlock(this);
+        }
+    }
+
+    public void removeCard(Card card){
+        if(cards.contains(card)){
+            cards.remove(card);
+            card.setBlock(null);
+        }
+    }
 
     @Override
     public String toString() {
-        return "Card{" +
+        return "Block{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", block=" + block +
+                ", space=" + space +
                 '}';
     }
 }

@@ -1,6 +1,5 @@
-package com.marella.javaobjectclasses;
+package com.marella.models;
 
-import com.marella.appuser.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +23,7 @@ public class Permission {
                     name = "enrolment_user_id_fk"
             )
     )
-    private AppUser user;
+    private User user;
 
     @ManyToOne
     @MapsId("SpaceId")
@@ -36,13 +35,13 @@ public class Permission {
     )
     private Space space;
 
-    public Permission(AppUser user, Space space) {
+    public Permission(User user, Space space) {
         this.id = new PermissionId(user.getId(), space.getId());
         this.user = user;
         this.space = space;
     }
 
-    public Permission(PermissionId id, AppUser user, Space space) {
+    public Permission(PermissionId id, User user, Space space) {
         this.id = id;
         this.user = user;
         this.space = space;

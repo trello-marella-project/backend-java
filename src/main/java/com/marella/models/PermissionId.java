@@ -1,4 +1,4 @@
-package com.marella.javaobjectclasses;
+package com.marella.models;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
