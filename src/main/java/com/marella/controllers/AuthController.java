@@ -3,8 +3,10 @@ package com.marella.controllers;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.marella.email.EmailService;
 import com.marella.exception.TokenRefreshException;
 import com.marella.models.RefreshToken;
 import com.marella.models.Role;
@@ -12,6 +14,7 @@ import com.marella.models.User;
 import com.marella.payload.request.TokenRefreshRequest;
 import com.marella.payload.response.TokenRefreshResponse;
 import com.marella.security.services.RefreshTokenService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,11 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.marella.models.ERole;
 import com.marella.payload.request.LoginRequest;
@@ -40,19 +39,23 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+@AllArgsConstructor
 public class AuthController {
-    @Autowired
+
     AuthenticationManager authenticationManager;
-    @Autowired
+
     UserRepository userRepository;
-    @Autowired
+
     RoleRepository roleRepository;
-    @Autowired
+
     PasswordEncoder encoder;
-    @Autowired
+
     JwtUtils jwtUtils;
-    @Autowired
+
     RefreshTokenService refreshTokenService;
+
+    EmailService emailService;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -131,6 +134,16 @@ public class AuthController {
         }
         user.setRoles(roles);
         userRepository.save(user);
+        String token = UUID.randomUUID().toString();
+        emailService.send(user.getEmail(), "http://localhost:8080/api/auth/activate/" + token);
+        // TODO: Нужно сохранять token в базу данных
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @GetMapping("/activation/{token}")
+    public ResponseEntity<?> activation(@RequestParam String token){
+        // TODO: Реализовать активацию пользователя
+        // TODO: Реализовать редирект на фронт
+        return null;
     }
 }
