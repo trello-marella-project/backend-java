@@ -1,21 +1,22 @@
 package com.marella.controllers;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.marella.email.EmailService;
 import com.marella.exception.TokenRefreshException;
-import com.marella.models.RefreshToken;
-import com.marella.models.Role;
-import com.marella.models.User;
+import com.marella.models.*;
 import com.marella.payload.request.TokenRefreshRequest;
 import com.marella.payload.response.TokenRefreshResponse;
+import com.marella.repositories.ActivationTokenRepository;
 import com.marella.security.services.RefreshTokenService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import com.marella.models.ERole;
 import com.marella.payload.request.LoginRequest;
 import com.marella.payload.request.SignupRequest;
 import com.marella.payload.response.JwtResponse;
@@ -48,6 +48,8 @@ public class AuthController {
 
     RoleRepository roleRepository;
 
+    ActivationTokenRepository activationTokenRepository;
+
     PasswordEncoder encoder;
 
     JwtUtils jwtUtils;
@@ -56,13 +58,21 @@ public class AuthController {
 
     EmailService emailService;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
 
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        String username = userPrincipal.getUsername();
+        if(!userRepository.findByUsername(username).get().getEnabled()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Warning: Email is not activated");
+        }
+
+        String jwt = jwtUtils.generateTokenFromUsername(username);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
@@ -73,6 +83,7 @@ public class AuthController {
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
+                // is_enabled
                 roles));
     }
 
@@ -106,44 +117,36 @@ public class AuthController {
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
-        Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
+        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(userRole);
         user.setRoles(roles);
         userRepository.save(user);
-        String token = UUID.randomUUID().toString();
-        emailService.send(user.getEmail(), "http://localhost:8080/api/auth/activate/" + token);
-        // TODO: Нужно сохранять token в базу данных
+
+        ActivationToken activationToken = new ActivationToken(UUID.randomUUID().toString(), user);
+        activationTokenRepository.save(activationToken);
+        emailService.send(user.getEmail(), "http://localhost:8080/api/auth/activate/" + activationToken.getToken());
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-    @GetMapping("/activation/{token}")
-    public ResponseEntity<?> activation(@RequestParam String token){
-        // TODO: Реализовать активацию пользователя
-        // TODO: Реализовать редирект на фронт
-        return null;
+    @GetMapping("/activate/{token}")
+    public ResponseEntity<?> activation(@PathVariable("token") String token) throws URISyntaxException {
+        ActivationToken activationToken = activationTokenRepository.getByToken(token)
+                .orElseThrow(() -> new RuntimeException("Error: token is incorrect"));
+        activationTokenRepository.delete(activationToken);
+        logger.info("activation token deleted");
+
+        User user = activationToken.getUser();
+        user.setEnabled(true);
+        userRepository.save(user);
+        logger.info("user set as enabled");
+
+        logger.info("redirect");
+        URI externalUri = new URI("https://vk.com/s_larkin");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(externalUri);
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
     }
 }
