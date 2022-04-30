@@ -22,15 +22,15 @@ public class MarellaApplication {
         SpringApplication.run(MarellaApplication.class, args);
     }
 
-//    @Bean
-//    CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
-//        return args -> {
-//            Role role_admin = new Role(ROLE_ADMIN);
-//            Role role_user = new Role(ROLE_USER);
-//            Role role_moderator = new Role(ROLE_MODERATOR);
-//            Set<Role> roles = Stream.of(role_admin, role_user, role_moderator).collect(Collectors.toSet());
-//
-//            roleRepository.saveAll(roles);
+    @Bean
+    CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
+        return args -> {
+            Role role_admin = new Role(ROLE_ADMIN);
+            Role role_user = new Role(ROLE_USER);
+            Role role_moderator = new Role(ROLE_MODERATOR);
+            Set<Role> roles = Stream.of(role_admin, role_user, role_moderator).collect(Collectors.toSet());
+
+            roleRepository.saveAll(roles);
 
 //            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 //            User semen = new User(
@@ -43,8 +43,8 @@ public class MarellaApplication {
 //            appUserRepository.save(semen);
 
 //            debug(appUserRepository, spaceRepository);
-//        };
-//    }
+        };
+    }
 
 //    private void debug(AppUserRepository appUserRepository, SpaceRepository spaceRepository) {
 //        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();

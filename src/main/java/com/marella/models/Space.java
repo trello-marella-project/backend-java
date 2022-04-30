@@ -40,7 +40,7 @@ public class Space {
 
     @ManyToOne
     @JoinColumn(
-            name = "author_id",
+            name = "user_id",
             nullable = false,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(
