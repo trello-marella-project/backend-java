@@ -23,6 +23,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.web.bind.annotation.*;
 
 import com.marella.payload.request.LoginRequest;
@@ -33,7 +34,11 @@ import com.marella.repositories.RoleRepository;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.security.services.UserDetailsImpl;
+import org.springframework.web.client.HttpServerErrorException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -61,42 +66,58 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        // authentication
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // is user enabled (set as filter)
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         String username = userPrincipal.getUsername();
         if(!userRepository.findByUsername(username).get().getEnabled()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Warning: Email is not activated");
         }
 
+        // generating jwt
         String jwt = jwtUtils.generateTokenFromUsername(username);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
+        // constructing response
+        Cookie cookie = new Cookie("refresh", refreshToken.getToken());
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
         return ResponseEntity.ok(new JwtResponse(jwt,
                 refreshToken.getToken(),
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                // is_enabled
                 roles));
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
-//        TODO: add access jwt sending
-        String requestRefreshToken = request.getRefreshToken();
+    public ResponseEntity<?> refreshtoken(@CookieValue(value = "refresh") Cookie cookie, HttpServletResponse response) {
+        if(cookie == null){
+            throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, "Error: cookie for refreshing not found");
+        }
+        logger.info("request cookie is " + cookie.getValue());
+        String requestRefreshToken = cookie.getValue();
         return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::deleteToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
+                    RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
                     String token = jwtUtils.generateTokenFromUsername(user.getUsername());
-                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+
+                    Cookie newCookie = new Cookie("refresh", refreshToken.getToken());
+                    newCookie.setHttpOnly(true);
+                    response.addCookie(newCookie);
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, refreshToken.getToken()));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                         "Refresh token is not in database!"));
