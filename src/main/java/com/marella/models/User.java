@@ -79,6 +79,14 @@ public class User{
     )
     private List<Permission> permissions = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "user",
+            orphanRemoval = true,
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Permission> entrances = new ArrayList<>();
+
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;

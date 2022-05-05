@@ -61,6 +61,14 @@ public class Space {
             mappedBy = "space",
             orphanRemoval = true,
             cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
+    private List<Permission> entrances = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "space",
+            orphanRemoval = true,
+            cascade = CascadeType.ALL,
             fetch = FetchType.LAZY
     )
     private List<Tag> tags = new ArrayList<>();

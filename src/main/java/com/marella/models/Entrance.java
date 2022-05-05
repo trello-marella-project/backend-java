@@ -5,15 +5,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity(name = "Permission")
-@Table(name = "permission")
-public class Permission {
+@Entity(name = "Entrance")
+@Table(name = "entrance")
+public class Entrance {
     @EmbeddedId
-    private PermissionId id;
+    private EntranceId id;
 
     @ManyToOne
     @MapsId("UserId")
@@ -35,15 +37,6 @@ public class Permission {
     )
     private Space space;
 
-    public Permission(User user, Space space) {
-        this.id = new PermissionId(user.getId(), space.getId());
-        this.user = user;
-        this.space = space;
-    }
-
-    public Permission(PermissionId id, User user, Space space) {
-        this.id = id;
-        this.user = user;
-        this.space = space;
-    }
+    @Column(nullable = false)
+    private GregorianCalendar date;
 }
