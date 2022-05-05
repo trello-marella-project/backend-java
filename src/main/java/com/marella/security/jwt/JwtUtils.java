@@ -2,6 +2,7 @@ package com.marella.security.jwt;
 
 import java.util.Date;
 
+import com.marella.models.User;
 import com.marella.security.services.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

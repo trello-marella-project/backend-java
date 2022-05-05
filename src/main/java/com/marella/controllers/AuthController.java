@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import com.marella.email.EmailService;
 import com.marella.exception.TokenRefreshException;
 import com.marella.models.*;
-import com.marella.payload.request.TokenRefreshRequest;
 import com.marella.payload.response.TokenRefreshResponse;
 import com.marella.repositories.ActivationTokenRepository;
 import com.marella.security.services.RefreshTokenService;
@@ -23,7 +22,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.web.bind.annotation.*;
 
 import com.marella.payload.request.LoginRequest;
@@ -37,7 +35,6 @@ import com.marella.security.services.UserDetailsImpl;
 import org.springframework.web.client.HttpServerErrorException;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -99,6 +96,7 @@ public class AuthController {
                 roles));
     }
 
+    // TODO: /auth/refresh and GET
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(@CookieValue(value = "refresh") Cookie cookie, HttpServletResponse response) {
         if(cookie == null){
