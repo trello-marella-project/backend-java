@@ -8,11 +8,11 @@ import java.util.List;
 
 @Service
 public interface SpaceService {
-    List<Space> getUserSpacesByLimitAndPage(User user, Long limit, Long page);
+    List<Space> getUserSpacesByLimitAndPage(User user, int limit, int page);
 
-    List<Space> getUserPermittedSpacesByLimitAndPage(User user, Long limit, Long page);
+    List<Space> getUserPermittedSpacesByLimitAndPage(User user, int limit, int page);
 
-    List<Space> getUserRecentSpacesByLimitAndPage(User user, Long limit, Long page);
+    List<Space> getUserRecentSpacesByLimitAndPage(User user, int limit, int page);
 
-    List<Space> getSearch(User user, Long limit, Long page, List<Long> tags_id, String search);
+    List<Space> getSearch(User user, int limit, int page, List<Long> tags_id, String search);
 }

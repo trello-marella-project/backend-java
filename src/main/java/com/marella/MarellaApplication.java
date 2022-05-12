@@ -1,13 +1,18 @@
 package com.marella;
 
 import com.marella.models.*;
+import com.marella.repositories.EntranceRepository;
 import com.marella.repositories.RoleRepository;
+import com.marella.repositories.SpaceRepository;
+import com.marella.repositories.UserRepository;
+import org.apache.tomcat.jni.Time;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,15 +27,36 @@ public class MarellaApplication {
         SpringApplication.run(MarellaApplication.class, args);
     }
 
-    @Bean
-    CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
-        return args -> {
-            Role role_admin = new Role(ROLE_ADMIN);
-            Role role_user = new Role(ROLE_USER);
-            Role role_moderator = new Role(ROLE_MODERATOR);
-            Set<Role> roles = Stream.of(role_admin, role_user, role_moderator).collect(Collectors.toSet());
+//    @Bean
+//    CommandLineRunner commandLineRunner(RoleRepository roleRepository,
+//                                        SpaceRepository spaceRepository,
+//                                        UserRepository userRepository,
+//                                        EntranceRepository entranceRepository) {
+//        return args -> {
+//            Role role_admin = new Role(ROLE_ADMIN);
+//            Role role_user = new Role(ROLE_USER);
+//            Role role_moderator = new Role(ROLE_MODERATOR);
+//            Set<Role> roles = Stream.of(role_admin, role_user, role_moderator).collect(Collectors.toSet());
+//
+//            roleRepository.saveAll(roles);
+//            User user = userRepository.getById(1L);
+//            Space space = spaceRepository.getById(1L);
 
-            roleRepository.saveAll(roles);
+//            Space space = new Space("space1", true);
+//            space.setUser(user);
+//            spaceRepository.save(space);
+
+//            EntranceId id = new EntranceId(user.getId(), space.getId());
+//            Entrance entrance = new Entrance();
+//            entrance.setId(id);
+//            entrance.setUser(user);
+//            entrance.setSpace(space);
+//            entrance.setDate(new GregorianCalendar());
+//            System.out.println(entrance.toString());
+//            entranceRepository.save(entrance);
+
+
+
 
 //            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 //            User semen = new User(
@@ -43,8 +69,8 @@ public class MarellaApplication {
 //            appUserRepository.save(semen);
 
 //            debug(appUserRepository, spaceRepository);
-        };
-    }
+//        };
+//    }
 
 //    private void debug(AppUserRepository appUserRepository, SpaceRepository spaceRepository) {
 //        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();

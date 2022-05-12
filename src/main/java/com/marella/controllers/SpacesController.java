@@ -26,32 +26,32 @@ public class SpacesController {
     private TagRepository tagRepository;
 
     @GetMapping("/yours")
-    public ResponseEntity<?> userSpaces(@RequestParam("limit") Long limit,
-                                        @RequestParam("page") Long page,
+    public ResponseEntity<?> userSpaces(@RequestParam("limit") int limit,
+                                        @RequestParam("page") int page,
                                         @RequestHeader(name = "Authorization") String authorization){
         User user = getUser(authorization);
         return ResponseEntity.ok(spaceService.getUserSpacesByLimitAndPage(user, limit, page));
     }
 
     @GetMapping("/permitted")
-    public ResponseEntity<?> userPermittedSpaces(@RequestParam("limit") Long limit,
-                                                 @RequestParam("page") Long page,
+    public ResponseEntity<?> userPermittedSpaces(@RequestParam("limit") int limit,
+                                                 @RequestParam("page") int page,
                                                  @RequestHeader(name = "Authorization") String authorization){
         User user = getUser(authorization);
         return ResponseEntity.ok(spaceService.getUserPermittedSpacesByLimitAndPage(user, limit, page));
     }
 
     @GetMapping("/recent")
-    public ResponseEntity<?> userRecentSpaces(@RequestParam("limit") Long limit,
-                                              @RequestParam("page") Long page,
+    public ResponseEntity<?> userRecentSpaces(@RequestParam("limit") int limit,
+                                              @RequestParam("page") int page,
                                               @RequestHeader(name = "Authorization") String authorization){
         User user = getUser(authorization);
         return ResponseEntity.ok(spaceService.getUserRecentSpacesByLimitAndPage(user, limit, page));
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> userRecentSpaces(@RequestParam("limit") Long limit,
-                                              @RequestParam("page") Long page,
+    public ResponseEntity<?> userRecentSpaces(@RequestParam("limit") int limit,
+                                              @RequestParam("page") int page,
                                               @RequestParam("tags_id") List<Long> tags_id,
                                               @RequestParam("search") String search,
                                               @RequestHeader(name = "Authorization") String authorization){
