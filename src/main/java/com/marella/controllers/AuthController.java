@@ -96,8 +96,7 @@ public class AuthController {
                 roles));
     }
 
-    // TODO: /auth/refresh and GET
-    @PostMapping("/refreshtoken")
+    @GetMapping("/refresh")
     public ResponseEntity<?> refreshtoken(@CookieValue(value = "refresh") Cookie cookie, HttpServletResponse response) {
         if(cookie == null){
             throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, "Error: cookie for refreshing not found");
