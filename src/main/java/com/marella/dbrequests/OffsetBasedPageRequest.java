@@ -12,7 +12,6 @@ public class OffsetBasedPageRequest implements Pageable {
     private int offset;
 
     // Constructor could be expanded if sorting is needed
-//    private Sort sort = new Sort(Sort.Direction.DESC, "date");
     private Sort sort = Sort.by(Sort.Direction.DESC, "date");
     public OffsetBasedPageRequest(int limit, int offset) {
         if (limit < 1) {

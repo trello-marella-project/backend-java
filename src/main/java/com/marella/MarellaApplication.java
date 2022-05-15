@@ -37,20 +37,23 @@ public class MarellaApplication {
 //            Role role_user = new Role(ROLE_USER);
 //            Role role_moderator = new Role(ROLE_MODERATOR);
 //            Set<Role> roles = Stream.of(role_admin, role_user, role_moderator).collect(Collectors.toSet());
-//
 //            roleRepository.saveAll(roles);
+//
 //            User user = userRepository.getById(1L);
 //            Space space = spaceRepository.getById(1L);
+//
+//            Space space1 = new Space("space1", true);
+//            space1.setUser(user);
+//            spaceRepository.save(space1);
+//            Space space3 = new Space("space3", true);
+//            space3.setUser(user);
+//            spaceRepository.save(space3);
 
-//            Space space = new Space("space1", true);
-//            space.setUser(user);
-//            spaceRepository.save(space);
-
-//            EntranceId id = new EntranceId(user.getId(), space.getId());
+//            EntranceId id = new EntranceId(user.getId(), space1.getId());
 //            Entrance entrance = new Entrance();
 //            entrance.setId(id);
 //            entrance.setUser(user);
-//            entrance.setSpace(space);
+//            entrance.setSpace(space1);
 //            entrance.setDate(new GregorianCalendar());
 //            System.out.println(entrance.toString());
 //            entranceRepository.save(entrance);
