@@ -40,10 +40,4 @@ public class Permission {
         this.user = user;
         this.space = space;
     }
-
-    public Permission(PermissionId id, User user, Space space) {
-        this.id = id;
-        this.user = user;
-        this.space = space;
-    }
 }
