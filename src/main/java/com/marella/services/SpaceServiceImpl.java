@@ -3,6 +3,7 @@ package com.marella.services;
 import com.marella.dbrequests.OffsetBasedPageRequest;
 import com.marella.models.Space;
 import com.marella.models.User;
+import com.marella.payload.SpaceSearch;
 import com.marella.payload.response.SpaceResponse;
 import com.marella.repositories.SpaceRepository;
 import lombok.AllArgsConstructor;
@@ -30,11 +31,15 @@ public class SpaceServiceImpl implements SpaceService{
 
     @Override
     public List<SpaceResponse> getUserRecentSpacesByLimitAndPage(User user, int limit, int page) {
-        return null;
+        Pageable pageable = new OffsetBasedPageRequest(limit, limit * page);
+        return spaceRepository.findRecentByUser(user.getId(), pageable);
     }
 
     @Override
-    public List<SpaceResponse> getSearch(User user, int limit, int page, List<Long> tags_id, String search) {
-        return null;
+    public List<SpaceSearch> getSearch(User user, int limit, int page, List<Long> tags_id, String search) {
+//        TODO: customize searching process
+//        TODO: customize request to DB
+        Pageable pageable = new OffsetBasedPageRequest(limit, limit * page);
+        return spaceRepository.findSpaces(user.getId(), tags_id, search, pageable);
     }
 }

@@ -1,6 +1,7 @@
 package com.marella.controllers;
 
 import com.marella.models.User;
+import com.marella.payload.response.SpaceResponse;
 import com.marella.repositories.TagRepository;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -28,40 +30,55 @@ public class SpacesController {
     @GetMapping("/yours")
     public ResponseEntity<?> userSpaces(@RequestParam("limit") int limit,
                                         @RequestParam("page") int page,
-                                        @RequestHeader(name = "Authorization") String authorization){
+                                        @RequestHeader(name = "Authorization") String authorization,
+                                        HttpServletResponse response) {
         User user = getUser(authorization);
-        return ResponseEntity.ok(spaceService.getUserSpacesByLimitAndPage(user, limit, page));
+        logger.info("username " + user.getUsername());
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(ResponseRender(spaceService.getUserSpacesByLimitAndPage(user, limit, page), "spaces"));
     }
 
     @GetMapping("/permitted")
     public ResponseEntity<?> userPermittedSpaces(@RequestParam("limit") int limit,
                                                  @RequestParam("page") int page,
-                                                 @RequestHeader(name = "Authorization") String authorization){
+                                                 @RequestHeader(name = "Authorization") String authorization) {
         User user = getUser(authorization);
-        return ResponseEntity.ok(spaceService.getUserPermittedSpacesByLimitAndPage(user, limit, page));
+        logger.info("username " + user.getUsername());
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(ResponseRender(spaceService.getUserPermittedSpacesByLimitAndPage(user, limit, page), "spaces"));
     }
 
     @GetMapping("/recent")
     public ResponseEntity<?> userRecentSpaces(@RequestParam("limit") int limit,
                                               @RequestParam("page") int page,
-                                              @RequestHeader(name = "Authorization") String authorization){
+                                              @RequestHeader(name = "Authorization") String authorization) {
         User user = getUser(authorization);
-        return ResponseEntity.ok(spaceService.getUserRecentSpacesByLimitAndPage(user, limit, page));
+        logger.info("username " + user.getUsername());
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(ResponseRender(spaceService.getUserRecentSpacesByLimitAndPage(user, limit, page), "spaces"));
     }
 
+    // TODO: correct parameters of request
     @GetMapping("/")
-    public ResponseEntity<?> userRecentSpaces(@RequestParam("limit") int limit,
-                                              @RequestParam("page") int page,
-                                              @RequestParam("tags_id") List<Long> tags_id,
-                                              @RequestParam("search") String search,
-                                              @RequestHeader(name = "Authorization") String authorization){
+    public ResponseEntity<?> userFindSpaces(@RequestParam("limit") int limit,
+                                            @RequestParam("page") int page,
+                                            @RequestParam("tags_id") List<Long> tags_id,
+                                            @RequestParam("search") String search,
+                                            @RequestHeader(name = "Authorization") String authorization) {
         User user = getUser(authorization);
-        return ResponseEntity.ok(spaceService.getSearch(user, limit, page, tags_id, search));
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(ResponseRender(spaceService.getSearch(user, limit, page, tags_id, search), "spaces"));
     }
 
     @GetMapping("/tags")
-    public ResponseEntity<?> userRecentSpaces(){
-        return ResponseEntity.ok(tagRepository.findAll());
+    public ResponseEntity<?> spacesTags() {
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(ResponseRender(tagRepository.findAll(), "tags"));
     }
 
     private User getUser(String authorization) {
@@ -70,5 +87,17 @@ public class SpacesController {
         return userRepository.findByUsername(username).get();
     }
 
-
+    private String ResponseRender(List<?> spaceResponses, String type) {
+        if (type.isEmpty()) return null;
+        if (spaceResponses.isEmpty()) return String.format("{\"%s\":[]}", type);
+        StringBuilder response = new StringBuilder();
+        String prefix = String.format("{\"%s\":[", type);
+        for (Object spaceResponse : spaceResponses) {
+            response.append(prefix);
+            prefix = ",";
+            response.append(spaceResponse.toString());
+        }
+        response.append("]}");
+        return response.toString();
+    }
 }

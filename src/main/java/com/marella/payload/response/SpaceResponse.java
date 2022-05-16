@@ -11,4 +11,14 @@ public class SpaceResponse {
     private String name;
     private boolean isPublic;
     private String username;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ",\"name\":\"" + name + '\"' +
+                ",\"isPublic\":" + isPublic +
+                ",\"username\":\"" + username + '\"' +
+                '}';
+    }
 }
