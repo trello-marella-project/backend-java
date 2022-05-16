@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SpaceRepository extends JpaRepository<Space, Long> {
@@ -43,4 +44,6 @@ public interface SpaceRepository extends JpaRepository<Space, Long> {
 //            "ON e.space.id = t.space.id " +
             "WHERE s.isPublic = TRUE OR s.user.id = ?1")
     List<SpaceSearch> findSpaces(Long user_id, List<Long> tags_id, String search, Pageable pageable);
+
+    Optional<Space> findByName(String name);
 }

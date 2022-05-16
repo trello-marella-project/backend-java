@@ -1,7 +1,7 @@
 package com.marella.controllers;
 
 import com.marella.models.User;
-import com.marella.payload.response.SpaceResponse;
+import com.marella.payload.request.SpaceCreationRequest;
 import com.marella.repositories.TagRepository;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
@@ -72,6 +72,28 @@ public class SpacesController {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/json")
                 .body(ResponseRender(spaceService.getSearch(user, limit, page, tags_id, search), "spaces"));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createSpace(@RequestBody SpaceCreationRequest spaceCreationRequest,
+                                         @RequestHeader(name = "Authorization") String authorization) {
+        User user = getUser(authorization);
+        logger.info(user.getUsername());
+        logger.info(spaceCreationRequest.getName());
+        logger.info(spaceCreationRequest.getMembers().toString());
+        logger.info(spaceCreationRequest.getTags().toString());
+        logger.info(String.valueOf(spaceCreationRequest.getPublic()));
+        try {
+            spaceService.createSpace(user,
+                    spaceCreationRequest.getName(),
+                    spaceCreationRequest.getMembers(),
+                    spaceCreationRequest.getTags(),
+                    spaceCreationRequest.getPublic());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+        return ResponseEntity.ok().header("Content-Type", "application/json").body("success");
     }
 
     @GetMapping("/tags")
