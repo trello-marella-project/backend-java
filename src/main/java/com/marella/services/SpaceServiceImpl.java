@@ -23,17 +23,18 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
-    public List<Space> getUserPermittedSpacesByLimitAndPage(User user, int limit, int page) {
+    public List<SpaceResponse> getUserPermittedSpacesByLimitAndPage(User user, int limit, int page) {
+        Pageable pageable = new OffsetBasedPageRequest(limit, limit * page);
+        return spaceRepository.findPermittedByUser(user.getId(), pageable);
+    }
+
+    @Override
+    public List<SpaceResponse> getUserRecentSpacesByLimitAndPage(User user, int limit, int page) {
         return null;
     }
 
     @Override
-    public List<Space> getUserRecentSpacesByLimitAndPage(User user, int limit, int page) {
-        return null;
-    }
-
-    @Override
-    public List<Space> getSearch(User user, int limit, int page, List<Long> tags_id, String search) {
+    public List<SpaceResponse> getSearch(User user, int limit, int page, List<Long> tags_id, String search) {
         return null;
     }
 }

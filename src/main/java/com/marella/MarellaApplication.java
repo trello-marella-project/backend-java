@@ -1,10 +1,7 @@
 package com.marella;
 
 import com.marella.models.*;
-import com.marella.repositories.EntranceRepository;
-import com.marella.repositories.RoleRepository;
-import com.marella.repositories.SpaceRepository;
-import com.marella.repositories.UserRepository;
+import com.marella.repositories.*;
 import org.apache.tomcat.jni.Time;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -31,7 +28,8 @@ public class MarellaApplication {
 //    CommandLineRunner commandLineRunner(RoleRepository roleRepository,
 //                                        SpaceRepository spaceRepository,
 //                                        UserRepository userRepository,
-//                                        EntranceRepository entranceRepository) {
+//                                        EntranceRepository entranceRepository,
+//                                        PermissionRepository permissionRepository) {
 //        return args -> {
 //            Role role_admin = new Role(ROLE_ADMIN);
 //            Role role_user = new Role(ROLE_USER);
@@ -39,8 +37,11 @@ public class MarellaApplication {
 //            Set<Role> roles = Stream.of(role_admin, role_user, role_moderator).collect(Collectors.toSet());
 //            roleRepository.saveAll(roles);
 //
-//            User user = userRepository.getById(1L);
-//            Space space = spaceRepository.getById(1L);
+//            User user = userRepository.getById(4L);
+//            Space space = spaceRepository.getById(4L);
+//            PermissionId permissionId = new PermissionId(user.getId(), space.getId());
+//            Permission permission = new Permission(permissionId, user, space);
+//            permissionRepository.save(permission);
 //
 //            Space space1 = new Space("space1", true);
 //            space1.setUser(user);

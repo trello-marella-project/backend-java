@@ -11,9 +11,9 @@ import java.util.List;
 public interface SpaceService {
     List<SpaceResponse> getUserSpacesByLimitAndPage(User user, int limit, int page);
 
-    List<Space> getUserPermittedSpacesByLimitAndPage(User user, int limit, int page);
+    List<SpaceResponse> getUserPermittedSpacesByLimitAndPage(User user, int limit, int page);
 
-    List<Space> getUserRecentSpacesByLimitAndPage(User user, int limit, int page);
+    List<SpaceResponse> getUserRecentSpacesByLimitAndPage(User user, int limit, int page);
 
-    List<Space> getSearch(User user, int limit, int page, List<Long> tags_id, String search);
+    List<SpaceResponse> getSearch(User user, int limit, int page, List<Long> tags_id, String search);
 }
