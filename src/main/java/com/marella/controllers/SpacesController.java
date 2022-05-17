@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 @RestController
 @RequestMapping("/api/spaces")
 @AllArgsConstructor
@@ -35,7 +37,7 @@ public class SpacesController {
         User user = getUser(authorization);
         logger.info("username " + user.getUsername());
         return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
+                .contentType(APPLICATION_JSON)
                 .body(ResponseRender(spaceService.getUserSpacesByLimitAndPage(user, limit, page), "spaces"));
     }
 
@@ -46,7 +48,7 @@ public class SpacesController {
         User user = getUser(authorization);
         logger.info("username " + user.getUsername());
         return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
+                .contentType(APPLICATION_JSON)
                 .body(ResponseRender(spaceService.getUserPermittedSpacesByLimitAndPage(user, limit, page), "spaces"));
     }
 
@@ -57,7 +59,7 @@ public class SpacesController {
         User user = getUser(authorization);
         logger.info("username " + user.getUsername());
         return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
+                .contentType(APPLICATION_JSON)
                 .body(ResponseRender(spaceService.getUserRecentSpacesByLimitAndPage(user, limit, page), "spaces"));
     }
 
@@ -70,7 +72,7 @@ public class SpacesController {
                                             @RequestHeader(name = "Authorization") String authorization) {
         User user = getUser(authorization);
         return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
+                .contentType(APPLICATION_JSON)
                 .body(ResponseRender(spaceService.getSearch(user, limit, page, tags_id, search), "spaces"));
     }
 
@@ -93,13 +95,13 @@ public class SpacesController {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
-        return ResponseEntity.ok().header("Content-Type", "application/json").body("success");
+        return ResponseEntity.ok().contentType(APPLICATION_JSON).body("success");
     }
 
     @GetMapping("/tags")
     public ResponseEntity<?> spacesTags() {
         return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
+                .contentType(APPLICATION_JSON)
                 .body(ResponseRender(tagRepository.findAll(), "tags"));
     }
 
