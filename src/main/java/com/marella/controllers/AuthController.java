@@ -16,11 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +39,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -62,38 +66,49 @@ public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         // authentication
+        logger.info("get username by email");
+        String email = loginRequest.getEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
+
+        logger.info("authenticate");
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(user.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // is user enabled (set as filter)
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-        String username = userPrincipal.getUsername();
+        // is user enabled TODO: set as filter
+        logger.info("get details");
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String username = userDetails.getUsername();
         if(!userRepository.findByUsername(username).get().getEnabled()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Warning: Email is not activated");
         }
 
-        // generating jwt
+        logger.info("create jwt");
         String jwt = jwtUtils.generateTokenFromUsername(username);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        logger.info("get roles");
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
+        logger.info("create refresh");
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-
+        logger.info("set cookies");
         // constructing response
         Cookie cookie = new Cookie("refresh", refreshToken.getToken());
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                refreshToken.getToken(),
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+        logger.info("return response");
+        return ResponseEntity.ok()
+                .contentType(APPLICATION_JSON)
+                .body(new JwtResponse(jwt,
+                        refreshToken.getToken(),
+                        userDetails.getUsername(),
+                        userDetails.getEmail(),
+                        roles,
+                        userDetails.isEnabled()).toString());
     }
 
     @GetMapping("/refresh")
@@ -120,7 +135,7 @@ public class AuthController {
                         "Refresh token is not in database!"));
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
