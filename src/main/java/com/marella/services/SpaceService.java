@@ -5,7 +5,9 @@ import com.marella.payload.SpaceSearch;
 import com.marella.payload.response.SpaceResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface SpaceService {
@@ -19,4 +21,5 @@ public interface SpaceService {
 
     void createSpace(User owner, String name, List<Long> members, List<String> tags, boolean isPublic);
 
+    void updateSpace(User user, Long spaceId, String name, Map<String, ArrayList<Long>> members, Map<String, ArrayList<String>> tags, boolean isPublic);
 }

@@ -1,5 +1,6 @@
 package com.marella.services;
 
+import com.marella.controllers.AuthController;
 import com.marella.dbrequests.OffsetBasedPageRequest;
 import com.marella.models.Permission;
 import com.marella.models.Space;
@@ -12,16 +13,22 @@ import com.marella.repositories.SpaceRepository;
 import com.marella.repositories.TagRepository;
 import com.marella.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class SpaceServiceImpl implements SpaceService{
+    private static final Logger logger = LoggerFactory.getLogger(SpaceServiceImpl.class);
+
     private SpaceRepository spaceRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
@@ -54,6 +61,7 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
+    @Transactional
     public void createSpace(User owner, String name, List<Long> members, List<String> tags, boolean isPublic) throws IllegalArgumentException {
         List<User> users = new ArrayList<>();
         for(Long id : members) {
@@ -72,5 +80,39 @@ public class SpaceServiceImpl implements SpaceService{
 //            tagRepository.findByName(tagName).ifPresentOrElse(space::addTag, () -> space.addTag(new Tag(tagName)));
 
         spaceRepository.save(space);
+    }
+
+    @Override
+    @Transactional
+    public void updateSpace(User owner, Long spaceId, String name, Map<String, ArrayList<Long>> members,
+                            Map<String, ArrayList<String>> tags, boolean isPublic) throws IllegalArgumentException{
+        Space space = spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
+        for(Long userId : members.get("added")){
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new IllegalArgumentException(String.format("user with id: %d does not exist", userId))
+            );
+            space.addPermission(new Permission(user, space));
+        }
+        for(Long userId : members.get("deleted")){
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new IllegalArgumentException(String.format("user with id: %d does not exist", userId))
+            );
+            Optional<Permission> permission = permissionRepository.findByUserAndSpace(user, space);
+            permission.ifPresentOrElse(space::removePermission,
+                    () -> logger.error(String.format("Permission for user with id %d and for space with id %d not found",
+                            userId, spaceId)));
+            permission.ifPresent(value -> logger.info(value.getId().toString()));
+        }
+        for(String tagName : tags.get("added")){
+            space.addTag(new Tag(tagName));
+        }
+        for(String tagName : tags.get("deleted")){
+            Optional<Tag> tag = tagRepository.findByNameAndSpace(tagName, space);
+            tag.ifPresent(space::removeTag);
+        }
+        space.setName(name);
+        space.setPublic(isPublic);
     }
 }

@@ -2,6 +2,7 @@ package com.marella.controllers;
 
 import com.marella.models.User;
 import com.marella.payload.request.SpaceCreationRequest;
+import com.marella.payload.request.SpaceUpdateRequest;
 import com.marella.repositories.TagRepository;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
@@ -9,6 +10,7 @@ import com.marella.services.SpaceService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,7 +78,7 @@ public class SpacesController {
                 .body(ResponseRender(spaceService.getSearch(user, limit, page, tags_id, search), "spaces"));
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<?> createSpace(@RequestBody SpaceCreationRequest spaceCreationRequest,
                                          @RequestHeader(name = "Authorization") String authorization) {
         User user = getUser(authorization);
@@ -84,13 +86,33 @@ public class SpacesController {
         logger.info(spaceCreationRequest.getName());
         logger.info(spaceCreationRequest.getMembers().toString());
         logger.info(spaceCreationRequest.getTags().toString());
-        logger.info(String.valueOf(spaceCreationRequest.getPublic()));
+        logger.info(String.valueOf(spaceCreationRequest.is_public()));
         try {
             spaceService.createSpace(user,
                     spaceCreationRequest.getName(),
                     spaceCreationRequest.getMembers(),
                     spaceCreationRequest.getTags(),
-                    spaceCreationRequest.getPublic());
+                    spaceCreationRequest.is_public());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(APPLICATION_JSON).body("success");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateSpace(@RequestBody SpaceUpdateRequest spaceUpdateRequest,
+                                         @PathVariable("id") Long spaceId,
+                                         @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        logger.info(String.valueOf(spaceUpdateRequest.is_public()));
+        try {
+            spaceService.updateSpace(user,
+                    spaceId,
+                    spaceUpdateRequest.getName(),
+                    spaceUpdateRequest.getMembers(),
+                    spaceUpdateRequest.getTags(),
+                    spaceUpdateRequest.is_public());
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
