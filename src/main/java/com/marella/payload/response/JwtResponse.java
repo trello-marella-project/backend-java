@@ -18,8 +18,8 @@ public class JwtResponse {
     @Override
     public String toString() {
         return "{" +
-                "\"access\":\"" + token + '\"' +
-                ",\"refresh\":\"" + refreshToken + '\"' +
+                "\"accessToken\":\"" + token + '\"' +
+                ",\"refreshToken\":\"" + refreshToken + '\"' +
                 ",\"user\":{" +
                 "\"username\":\"" + username + '\"' +
                 ",\"email\":\"" + email + '\"' +
