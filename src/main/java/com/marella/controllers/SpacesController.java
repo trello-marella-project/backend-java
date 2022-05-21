@@ -1,8 +1,10 @@
 package com.marella.controllers;
 
+import com.marella.models.Space;
 import com.marella.models.User;
 import com.marella.payload.request.SpaceCreationRequest;
 import com.marella.payload.request.SpaceUpdateRequest;
+import com.marella.payload.response.GetSpaceResponse;
 import com.marella.repositories.TagRepository;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
@@ -98,6 +100,20 @@ public class SpacesController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.CREATED).contentType(APPLICATION_JSON).body("success");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> gatSpace(@PathVariable("id") Long spaceId,
+                                      @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        Space space;
+        try {
+            space = spaceService.getSpace(user, spaceId);
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+        return ResponseEntity.ok().contentType(APPLICATION_JSON).body(new GetSpaceResponse(space).toString());
     }
 
     @PutMapping("/{id}")

@@ -83,6 +83,21 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
+    public Space getSpace(User user, Long spaceId) {
+        Space space = spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
+        if(space.isPublic()) return space;
+
+        Long userId = user.getId();
+        if(space.getUser().getId().equals(userId)) return space;
+        for(Permission permission : space.getPermissions()){
+            if(permission.getUser().getId().equals(userId))
+                return space;
+        }
+        throw new IllegalArgumentException(String.format("space with id: %d does not found", spaceId));
+    }
+    @Override
     @Transactional
     public void updateSpace(User owner, Long spaceId, String name, Map<String, ArrayList<Long>> members,
                             Map<String, ArrayList<String>> tags, boolean isPublic) throws IllegalArgumentException{
@@ -115,4 +130,5 @@ public class SpaceServiceImpl implements SpaceService{
         space.setName(name);
         space.setPublic(isPublic);
     }
+
 }

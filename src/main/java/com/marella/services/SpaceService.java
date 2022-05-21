@@ -1,5 +1,6 @@
 package com.marella.services;
 
+import com.marella.models.Space;
 import com.marella.models.User;
 import com.marella.payload.SpaceSearch;
 import com.marella.payload.response.SpaceResponse;
@@ -22,4 +23,6 @@ public interface SpaceService {
     void createSpace(User owner, String name, List<Long> members, List<String> tags, boolean isPublic);
 
     void updateSpace(User user, Long spaceId, String name, Map<String, ArrayList<Long>> members, Map<String, ArrayList<String>> tags, boolean isPublic);
+
+    Space getSpace(User user, Long spaceId);
 }
