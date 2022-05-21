@@ -20,19 +20,23 @@ public class GetSpaceResponse {
         response.append(String.format("{\"name\":\"%s\",", space.getName()));
 
         String prefix = "\"members\":[";
-        for(Permission permission: space.getPermissions()){
-            response.append(prefix);
-            response.append(permission.getUser().getId());
-            prefix = ",";
-        }
+        if (space.getPermissions().isEmpty()) response.append(prefix);
+        else
+            for (Permission permission : space.getPermissions()) {
+                response.append(prefix);
+                response.append(permission.getUser().getId());
+                prefix = ",";
+            }
         response.append("],");
 
         prefix = "\"tags\":[";
-        for(Tag tag: space.getTags()){
-            response.append(prefix);
-            response.append(String.format("\"%s\"", tag.getName()));
-            prefix = ",";
-        }
+        if (space.getTags().isEmpty()) response.append(prefix);
+        else
+            for (Tag tag : space.getTags()) {
+                response.append(prefix);
+                response.append(String.format("\"%s\"", tag.getName()));
+                prefix = ",";
+            }
         response.append("],");
 
         response.append(String.format("\"is_public\":%s}", space.isPublic()));
