@@ -95,7 +95,7 @@ public class SpaceServiceImpl implements SpaceService{
             if(permission.getUser().getId().equals(userId))
                 return space;
         }
-        throw new IllegalArgumentException(String.format("space with id: %d does not found", spaceId));
+        throw new IllegalArgumentException(String.format("forbidden to get space with id: %d", spaceId));
     }
     @Override
     @Transactional
@@ -104,6 +104,9 @@ public class SpaceServiceImpl implements SpaceService{
         Space space = spaceRepository.findById(spaceId).orElseThrow(
                 () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
         );
+        if(space.getUser() != owner)
+            throw new IllegalArgumentException(String.format("forbidden to update space with id: %d", spaceId));
+
         for(Long userId : members.get("added")){
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new IllegalArgumentException(String.format("user with id: %d does not exist", userId))
@@ -116,7 +119,7 @@ public class SpaceServiceImpl implements SpaceService{
             );
             Optional<Permission> permission = permissionRepository.findByUserAndSpace(user, space);
             permission.ifPresentOrElse(space::removePermission,
-                    () -> logger.error(String.format("Permission for user with id %d and for space with id %d not found",
+                    () -> logger.error(String.format("Permission for user with id %d and for space with id %d not exist",
                             userId, spaceId)));
             permission.ifPresent(value -> logger.info(value.getId().toString()));
         }
