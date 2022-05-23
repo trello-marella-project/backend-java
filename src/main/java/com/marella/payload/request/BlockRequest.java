@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BlockCreationRequest {
+public class BlockRequest {
     String name;
 }
