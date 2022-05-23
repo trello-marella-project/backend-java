@@ -2,7 +2,8 @@ package com.marella.controllers;
 
 import com.marella.models.Space;
 import com.marella.models.User;
-import com.marella.payload.request.BlockCreationRequest;
+import com.marella.payload.request.BlockRequest;
+import com.marella.payload.response.WorkspaceResponse;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
@@ -45,11 +46,11 @@ public class WorkspaceController {
 
     @PostMapping("/{workspace_id}/block")
     public ResponseEntity<?> createBlock(@PathVariable Long workspace_id,
-                                         @RequestBody BlockCreationRequest blockCreationRequest,
+                                         @RequestBody BlockRequest blockRequest,
                                          @RequestHeader(name = "Authorization") String authorization){
         User user = getUser(authorization);
         try{
-            spaceService.createBlock(user, workspace_id, blockCreationRequest.getName());
+            spaceService.createBlock(user, workspace_id, blockRequest.getName());
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest()
@@ -59,6 +60,25 @@ public class WorkspaceController {
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
                 .body("{\"status\":\"success\"}");
+    }
+
+    @PutMapping("/{workspace_id}/block/{block_id}")
+    public ResponseEntity<?> updateBlock(@PathVariable Long workspace_id,
+                                         @PathVariable Long block_id,
+                                         @RequestBody BlockRequest blockRequest,
+                                         @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        try{
+            spaceService.updateBlock(user, workspace_id, block_id, blockRequest.getName());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+        return ResponseEntity.ok()
+                .contentType(APPLICATION_JSON)
+                .body(new WorkspaceResponse(block_id, blockRequest.getName(), workspace_id));
     }
 
     private User getUser(String authorization) {

@@ -29,4 +29,6 @@ public interface SpaceService {
     void deleteSpaceById(User user, Long spaceId);
 
     void createBlock(User user, Long spaceId, String name);
+
+    void updateBlock(User user, Long spaceId, Long blockId, String name);
 }

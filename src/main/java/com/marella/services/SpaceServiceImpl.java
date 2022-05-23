@@ -4,10 +4,7 @@ import com.marella.dbrequests.OffsetBasedPageRequest;
 import com.marella.models.*;
 import com.marella.payload.SpaceSearch;
 import com.marella.payload.response.SpaceResponse;
-import com.marella.repositories.PermissionRepository;
-import com.marella.repositories.SpaceRepository;
-import com.marella.repositories.TagRepository;
-import com.marella.repositories.UserRepository;
+import com.marella.repositories.*;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +23,7 @@ public class SpaceServiceImpl implements SpaceService{
     private UserRepository userRepository;
     private TagRepository tagRepository;
     private PermissionRepository permissionRepository;
+    private EntranceRepository entranceRepository;
 
     @Override
     public List<SpaceResponse> getUserSpacesByLimitAndPage(User user, int limit, int page) {
@@ -142,6 +140,28 @@ public class SpaceServiceImpl implements SpaceService{
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
 
         space.addBlock(new Block(name));
+        spaceRepository.save(space);
+    }
+
+    @Override
+    public void updateBlock(User user, Long spaceId, Long blockId, String name) {
+        Space space = spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
+        if(!isPermitted(user, space))
+            throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
+        for(Block block : space.getBlocks()){
+            if(block.getId().equals(blockId)) {
+                block.setName(name);
+                break;
+            }
+        }
+        Optional<Entrance> entrance = entranceRepository.findByUserAndSpace(user, space);
+        if(entrance.isPresent()) {
+            entrance.get().setDate(new GregorianCalendar());
+            entranceRepository.save(entrance.get());
+        }
+        else space.addEntrance(new Entrance(user, space, new GregorianCalendar()));
         spaceRepository.save(space);
     }
 
