@@ -136,11 +136,42 @@ public class Space {
 
     @Override
     public String toString() {
-        return "Space{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", isPublic=" + isPublic +
-                ", user=" + user +
-                '}';
+        StringBuilder response = new StringBuilder();
+        response.append(String.format("{\"space_id\":\"%s\",", id));
+        response.append(String.format("\"is_public\":%s,", isPublic));
+        response.append(String.format("\"name\":\"%s\",", name));
+
+        String prefix = "\"members\":[";
+        if (permissions.isEmpty()) response.append(prefix);
+        else
+            for (Permission permission : permissions) {
+                response.append(prefix);
+                response.append(String.format("\"%s\"", permission.getUser().getUsername()));
+                prefix = ",";
+            }
+        response.append("],");
+
+        prefix = "\"blocks\":[";
+        if (blocks.isEmpty()) response.append(prefix);
+        else
+            for (Block block : blocks) {
+                response.append(prefix);
+                response.append(String.format("{\"block_id\":\"%s\",", block.getId()));
+                response.append(String.format("\"name\":\"%s\",", block.getName()));
+                String cardPrefix = "\"cards\":[";
+                if(block.getCards().isEmpty()) response.append(cardPrefix);
+                else
+                    for(Card card : block.getCards()){
+                        response.append(cardPrefix);
+                        response.append(String.format("{\"card_id\":\"%s\",", card.getId()));
+                        response.append(String.format("\"name\":\"%s\",", card.getName()));
+                        response.append(String.format("\"description\":\"%s\"}", card.getDescription()));
+                        cardPrefix = ",";
+                    }
+                response.append("]");
+                prefix = ",";
+            }
+        response.append("]}");
+        return response.toString();
     }
 }
