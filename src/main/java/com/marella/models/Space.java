@@ -120,14 +120,14 @@ public class Space {
         }
     }
 
-    public void addBlocks(Block block){
+    public void addBlock(Block block){
         if(!blocks.contains(block)){
             blocks.add(block);
             block.setSpace(this);
         }
     }
 
-    public void removeBlocks(Block block){
+    public void removeBlock(Block block){
         if(blocks.contains(block)){
             blocks.remove(block);
             block.setSpace(null);
