@@ -131,7 +131,7 @@ public class SpaceServiceImpl implements SpaceService{
 
 
     @Override
-    public void deleteSpaceById(User user, Long spaceId) {
+    public void deleteSpaceById(User user, Long spaceId) throws IllegalArgumentException{
         Space space = spaceRepository.findById(spaceId).orElseThrow(
                 () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
         );
@@ -139,4 +139,6 @@ public class SpaceServiceImpl implements SpaceService{
             throw new IllegalArgumentException(String.format("forbidden to delete space with id: %d", spaceId));
         spaceRepository.delete(space);
     }
+
+
 }
