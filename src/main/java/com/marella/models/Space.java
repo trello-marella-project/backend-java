@@ -137,7 +137,7 @@ public class Space {
     @Override
     public String toString() {
         StringBuilder response = new StringBuilder();
-        response.append(String.format("{\"space_id\":\"%s\",", id));
+        response.append(String.format("{\"space_id\":%d,", id));
         response.append(String.format("\"is_public\":%s,", isPublic));
         response.append(String.format("\"name\":\"%s\",", name));
 
@@ -156,7 +156,7 @@ public class Space {
         else
             for (Block block : blocks) {
                 response.append(prefix);
-                response.append(String.format("{\"block_id\":\"%s\",", block.getId()));
+                response.append(String.format("{\"block_id\":%d,", block.getId()));
                 response.append(String.format("\"name\":\"%s\",", block.getName()));
                 String cardPrefix = "\"cards\":[";
                 if(block.getCards().isEmpty()) response.append(cardPrefix);
@@ -171,7 +171,7 @@ public class Space {
                 response.append("]");
                 prefix = ",";
             }
-        response.append("]}");
+        response.append("]}}");
         return response.toString();
     }
 }
