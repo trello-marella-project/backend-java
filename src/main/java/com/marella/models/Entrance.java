@@ -38,4 +38,11 @@ public class Entrance {
 
     @Column(nullable = false)
     private GregorianCalendar date;
+
+    public Entrance(User user, Space space, GregorianCalendar date) {
+        this.id = new EntranceId(user.getId(), space.getId());
+        this.user = user;
+        this.space = space;
+        this.date = date;
+    }
 }
