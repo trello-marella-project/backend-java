@@ -61,9 +61,9 @@ public class Space {
             mappedBy = "space",
             orphanRemoval = true,
             cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
+            fetch = FetchType.LAZY
     )
-    private List<Permission> entrances = new ArrayList<>();
+    private List<Entrance> entrances = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "space",
@@ -94,6 +94,16 @@ public class Space {
 
     public void removePermission(Permission permission) {
         permissions.remove(permission);
+    }
+
+    public void addEntrance(Entrance entrance) {
+        if (!entrances.contains(entrance)) {
+            entrances.add(entrance);
+        }
+    }
+
+    public void removeEntrance(Entrance entrance) {
+        entrances.remove(entrance);
     }
 
     public void addTag(Tag tag){
