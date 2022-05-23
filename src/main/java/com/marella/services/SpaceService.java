@@ -25,4 +25,6 @@ public interface SpaceService {
     void updateSpace(User user, Long spaceId, String name, Map<String, ArrayList<Long>> members, Map<String, ArrayList<String>> tags, boolean isPublic);
 
     Space getSpace(User user, Long spaceId);
+
+    void deleteSpaceById(User user, Long spaceId);
 }

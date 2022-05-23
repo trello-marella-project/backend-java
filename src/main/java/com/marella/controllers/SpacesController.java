@@ -103,7 +103,7 @@ public class SpacesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> gatSpace(@PathVariable("id") Long spaceId,
+    public ResponseEntity<?> getSpace(@PathVariable("id") Long spaceId,
                                       @RequestHeader(name = "Authorization") String authorization){
         User user = getUser(authorization);
         Space space;
@@ -136,6 +136,19 @@ public class SpacesController {
         return ResponseEntity.ok().contentType(APPLICATION_JSON).body("success");
     }
 
+    @DeleteMapping ("/{id}")
+    public ResponseEntity<?> deleteSpace(@PathVariable("id") Long spaceId,
+                                         @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        try {
+            spaceService.deleteSpaceById(user, spaceId);
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+        return ResponseEntity.ok().contentType(APPLICATION_JSON).body("success");
+    }
+
     @GetMapping("/tags")
     public ResponseEntity<?> spacesTags() {
         return ResponseEntity.ok()
@@ -150,6 +163,7 @@ public class SpacesController {
     }
 
     private String ResponseRender(List<?> spaceResponses, String type) {
+        logger.info(spaceResponses.toString());
         if (type.isEmpty()) return null;
         if (spaceResponses.isEmpty()) return String.format("{\"%s\":[]}", type);
         StringBuilder response = new StringBuilder();

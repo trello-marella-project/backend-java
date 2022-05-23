@@ -1,11 +1,7 @@
 package com.marella.services;
 
-import com.marella.controllers.AuthController;
 import com.marella.dbrequests.OffsetBasedPageRequest;
-import com.marella.models.Permission;
-import com.marella.models.Space;
-import com.marella.models.Tag;
-import com.marella.models.User;
+import com.marella.models.*;
 import com.marella.payload.SpaceSearch;
 import com.marella.payload.response.SpaceResponse;
 import com.marella.repositories.PermissionRepository;
@@ -19,10 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -79,6 +72,7 @@ public class SpaceServiceImpl implements SpaceService{
             space.addTag(new Tag(tagName));
 //            tagRepository.findByName(tagName).ifPresentOrElse(space::addTag, () -> space.addTag(new Tag(tagName)));
 
+        space.addEntrance(new Entrance(owner, space, new GregorianCalendar()));
         spaceRepository.save(space);
     }
 
@@ -97,6 +91,7 @@ public class SpaceServiceImpl implements SpaceService{
         }
         throw new IllegalArgumentException(String.format("forbidden to get space with id: %d", spaceId));
     }
+
     @Override
     @Transactional
     public void updateSpace(User owner, Long spaceId, String name, Map<String, ArrayList<Long>> members,
@@ -134,4 +129,14 @@ public class SpaceServiceImpl implements SpaceService{
         space.setPublic(isPublic);
     }
 
+
+    @Override
+    public void deleteSpaceById(User user, Long spaceId) {
+        Space space = spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
+        if(space.getUser() != user)
+            throw new IllegalArgumentException(String.format("forbidden to delete space with id: %d", spaceId));
+        spaceRepository.delete(space);
+    }
 }
