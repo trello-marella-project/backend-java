@@ -2,6 +2,7 @@ package com.marella.controllers;
 
 import com.marella.models.Space;
 import com.marella.models.User;
+import com.marella.payload.request.BlockCreationRequest;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
@@ -10,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -38,11 +36,29 @@ public class WorkspaceController {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest()
                     .contentType(APPLICATION_JSON)
-                    .body(String.format("{Error: %s}", e.getMessage()));
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
         }
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
                 .body(space.toString());
+    }
+
+    @PostMapping("/{workspace_id}/block")
+    public ResponseEntity<?> createBlock(@PathVariable Long workspace_id,
+                                         @RequestBody BlockCreationRequest blockCreationRequest,
+                                         @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        try{
+            spaceService.createBlock(user, workspace_id, blockCreationRequest.getName());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+        return ResponseEntity.ok()
+                .contentType(APPLICATION_JSON)
+                .body("{\"status\":\"success\"}");
     }
 
     private User getUser(String authorization) {

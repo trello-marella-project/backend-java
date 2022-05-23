@@ -140,5 +140,26 @@ public class SpaceServiceImpl implements SpaceService{
         spaceRepository.delete(space);
     }
 
+    @Override
+    public void createBlock(User user, Long spaceId, String name) {
+        Space space = spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
+        if(!isPermitted(user, space))
+            throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
 
+        space.addBlock(new Block(name));
+        spaceRepository.save(space);
+    }
+
+    private boolean isPermitted(User user, Space space){
+        if(space.isPublic()) return true;
+        Long userId = user.getId();
+        if(space.getUser().getId().equals(userId)) return true;
+        for(Permission permission : space.getPermissions()){
+            if(permission.getUser().getId().equals(userId))
+                return true;
+        }
+        return false;
+    }
 }
