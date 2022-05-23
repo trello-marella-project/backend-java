@@ -81,14 +81,7 @@ public class SpaceServiceImpl implements SpaceService{
         Space space = spaceRepository.findById(spaceId).orElseThrow(
                 () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
         );
-        if(space.isPublic()) return space;
-
-        Long userId = user.getId();
-        if(space.getUser().getId().equals(userId)) return space;
-        for(Permission permission : space.getPermissions()){
-            if(permission.getUser().getId().equals(userId))
-                return space;
-        }
+        if(isPermitted(user, space)) return space;
         throw new IllegalArgumentException(String.format("forbidden to get space with id: %d", spaceId));
     }
 
