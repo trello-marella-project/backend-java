@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class WorkspaceResponse {
+public class BlockResponse {
     Long blockId;
     String name;
     Long spaceId;

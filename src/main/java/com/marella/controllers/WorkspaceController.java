@@ -3,7 +3,8 @@ package com.marella.controllers;
 import com.marella.models.Space;
 import com.marella.models.User;
 import com.marella.payload.request.BlockRequest;
-import com.marella.payload.response.WorkspaceResponse;
+import com.marella.payload.request.CardRequest;
+import com.marella.payload.response.BlockResponse;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Controller
@@ -57,7 +59,7 @@ public class WorkspaceController {
                     .contentType(APPLICATION_JSON)
                     .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
         }
-        return ResponseEntity.ok()
+        return ResponseEntity.status(CREATED)
                 .contentType(APPLICATION_JSON)
                 .body("{\"status\":\"success\"}");
     }
@@ -78,7 +80,7 @@ public class WorkspaceController {
         }
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
-                .body(new WorkspaceResponse(block_id, blockRequest.getName(), workspace_id));
+                .body(new BlockResponse(block_id, blockRequest.getName(), workspace_id));
     }
 
     @DeleteMapping("/{workspace_id}/block/{block_id}")
