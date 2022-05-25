@@ -156,10 +156,10 @@ public class SpaceServiceImpl implements SpaceService{
         Block block = blockRepository.findById(blockId).orElseThrow(
                 () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
         );
-
         List<Block> blocks = space.getBlocks();
         int index = blocks.indexOf(block);
         if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+
         blocks.get(index).setName(name);
         updateEntranceTime(user, space);
     }
@@ -175,12 +175,33 @@ public class SpaceServiceImpl implements SpaceService{
         Block block = blockRepository.findById(blockId).orElseThrow(
                 () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
         );
-
         List<Block> blocks = space.getBlocks();
         int index = blocks.indexOf(block);
         if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+
         space.removeBlock(block);
         updateEntranceTime(user, space);
+    }
+
+    @Override
+    @Transactional
+    public Long createCard(User user, Long spaceId, Long blockId, String name, String description) {
+        Space space = spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
+        if(!isPermitted(user, space))
+            throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
+        Block block = blockRepository.findById(blockId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
+        );
+        List<Block> blocks = space.getBlocks();
+        int index = blocks.indexOf(block);
+        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+
+        Card card = new Card(name, description);
+        block.addCard(card);
+        updateEntranceTime(user, space);
+        return card.getId();
     }
 
     private void updateEntranceTime(User user, Space space) {

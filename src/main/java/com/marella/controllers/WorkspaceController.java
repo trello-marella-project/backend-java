@@ -5,6 +5,7 @@ import com.marella.models.User;
 import com.marella.payload.request.BlockRequest;
 import com.marella.payload.request.CardRequest;
 import com.marella.payload.response.BlockResponse;
+import com.marella.payload.response.CardResponse;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
@@ -61,6 +62,7 @@ public class WorkspaceController {
         }
         return ResponseEntity.status(CREATED)
                 .contentType(APPLICATION_JSON)
+                // TODO: change response
                 .body("{\"status\":\"success\"}");
     }
 
@@ -99,6 +101,26 @@ public class WorkspaceController {
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
                 .body("{\"status\":\"success\"}");
+    }
+
+    @PostMapping("/{workspace_id}/block/{block_id}/card")
+    public ResponseEntity<?> createCard(@PathVariable Long workspace_id,
+                                        @PathVariable Long block_id,
+                                        @RequestBody CardRequest cardRequest,
+                                        @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        Long cardId;
+        try{
+            cardId = spaceService.createCard(user, workspace_id, block_id, cardRequest.getName(), cardRequest.getDescription());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+        return ResponseEntity.status(CREATED)
+                .contentType(APPLICATION_JSON)
+                .body(new CardResponse(cardId, block_id, cardRequest.getName()).toString());
     }
 
     private User getUser(String authorization) {

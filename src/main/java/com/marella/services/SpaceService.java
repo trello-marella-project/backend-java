@@ -28,9 +28,12 @@ public interface SpaceService {
 
     void deleteSpaceById(User user, Long spaceId);
 
+    // TODO: change return type to Long
     void createBlock(User user, Long spaceId, String name);
 
     void updateBlock(User user, Long spaceId, Long blockId, String name);
 
-    void deleteBlock(User user, Long workspaceId, Long blockId);
+    void deleteBlock(User user, Long spaceId, Long blockId);
+
+    Long createCard(User user, Long spaceId, Long blockId, String name, String description);
 }
