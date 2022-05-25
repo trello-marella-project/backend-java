@@ -81,6 +81,24 @@ public class WorkspaceController {
                 .body(new WorkspaceResponse(block_id, blockRequest.getName(), workspace_id));
     }
 
+    @DeleteMapping("/{workspace_id}/block/{block_id}")
+    public ResponseEntity<?> deleteBlock(@PathVariable Long workspace_id,
+                                         @PathVariable Long block_id,
+                                         @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        try{
+            spaceService.deleteBlock(user, workspace_id, block_id);
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+        return ResponseEntity.ok()
+                .contentType(APPLICATION_JSON)
+                .body("{\"status\":\"success\"}");
+    }
+
     private User getUser(String authorization) {
         String token = authorization.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);

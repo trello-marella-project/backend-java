@@ -24,6 +24,7 @@ public class SpaceServiceImpl implements SpaceService{
     private TagRepository tagRepository;
     private PermissionRepository permissionRepository;
     private EntranceRepository entranceRepository;
+    private BlockRepository blockRepository;
 
     @Override
     public List<SpaceResponse> getUserSpacesByLimitAndPage(User user, int limit, int page) {
@@ -132,6 +133,7 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
+    @Transactional
     public void createBlock(User user, Long spaceId, String name) {
         Space space = spaceRepository.findById(spaceId).orElseThrow(
                 () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
@@ -144,18 +146,44 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
+    @Transactional
     public void updateBlock(User user, Long spaceId, Long blockId, String name) {
         Space space = spaceRepository.findById(spaceId).orElseThrow(
                 () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
         );
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
-        for(Block block : space.getBlocks()){
-            if(block.getId().equals(blockId)) {
-                block.setName(name);
-                break;
-            }
-        }
+        Block block = blockRepository.findById(blockId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
+        );
+
+        List<Block> blocks = space.getBlocks();
+        int index = blocks.indexOf(block);
+        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+        blocks.get(index).setName(name);
+        updateEntranceTime(user, space);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBlock(User user, Long spaceId, Long blockId) {
+        Space space = spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
+        if(!isPermitted(user, space))
+            throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
+        Block block = blockRepository.findById(blockId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
+        );
+
+        List<Block> blocks = space.getBlocks();
+        int index = blocks.indexOf(block);
+        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+        space.removeBlock(block);
+        updateEntranceTime(user, space);
+    }
+
+    private void updateEntranceTime(User user, Space space) {
         Optional<Entrance> entrance = entranceRepository.findByUserAndSpace(user, space);
         if(entrance.isPresent()) {
             entrance.get().setDate(new GregorianCalendar());
