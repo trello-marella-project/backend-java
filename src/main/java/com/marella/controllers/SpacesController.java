@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -36,8 +35,7 @@ public class SpacesController {
     @GetMapping("/yours")
     public ResponseEntity<?> userSpaces(@RequestParam("limit") int limit,
                                         @RequestParam("page") int page,
-                                        @RequestHeader(name = "Authorization") String authorization,
-                                        HttpServletResponse response) {
+                                        @RequestHeader(name = "Authorization") String authorization) {
         User user = getUser(authorization);
         logger.info("username " + user.getUsername());
         return ResponseEntity.ok()
@@ -99,7 +97,7 @@ public class SpacesController {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).contentType(APPLICATION_JSON).body("success");
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
     }
 
     @GetMapping("/{id}")
@@ -133,7 +131,7 @@ public class SpacesController {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
-        return ResponseEntity.ok().contentType(APPLICATION_JSON).body("success");
+        return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
     }
 
     @DeleteMapping ("/{id}")
@@ -146,7 +144,7 @@ public class SpacesController {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
-        return ResponseEntity.ok().contentType(APPLICATION_JSON).body("success");
+        return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
     }
 
     @GetMapping("/tags")
