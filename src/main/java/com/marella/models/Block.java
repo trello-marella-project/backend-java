@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -67,6 +68,20 @@ public class Block {
             cards.remove(card);
             card.setBlock(null);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (id == null) return false;
+        if (this == o) return true;
+        if (!(o instanceof Block)) return false;
+        Block block = (Block) o;
+        return id.equals(block.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
