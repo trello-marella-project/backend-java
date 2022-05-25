@@ -168,10 +168,10 @@ public class Space {
                         response.append(String.format("\"description\":\"%s\"}", card.getDescription()));
                         cardPrefix = ",";
                     }
-                response.append("]");
+                response.append("]}");
                 prefix = ",";
             }
-        response.append("]}}");
+        response.append("]}");
         return response.toString();
     }
 }
