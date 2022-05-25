@@ -16,13 +16,13 @@ import static javax.persistence.GenerationType.SEQUENCE;
 public class Card {
     @Id
     @SequenceGenerator(
-            name = "user_sequence",
-            sequenceName = "user_sequence",
+            name = "card_sequence",
+            sequenceName = "card_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = SEQUENCE,
-            generator = "user_sequence"
+            generator = "card_sequence"
     )
     private Long id;
 
@@ -42,6 +42,16 @@ public class Card {
             )
     )
     private Block block;
+
+    public Card(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Card(String name) {
+        this.name = name;
+        this.description = "";
+    }
 
     @Override
     public String toString() {

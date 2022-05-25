@@ -20,13 +20,13 @@ import static javax.persistence.GenerationType.SEQUENCE;
 public class Block {
     @Id
     @SequenceGenerator(
-            name = "user_sequence",
-            sequenceName = "user_sequence",
+            name = "block_sequence",
+            sequenceName = "block_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = SEQUENCE,
-            generator = "user_sequence"
+            generator = "block_sequence"
     )
     private Long id;
 
