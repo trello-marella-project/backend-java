@@ -52,8 +52,9 @@ public class WorkspaceController {
                                          @RequestBody BlockRequest blockRequest,
                                          @RequestHeader(name = "Authorization") String authorization){
         User user = getUser(authorization);
+        Long blockId;
         try{
-            spaceService.createBlock(user, workspace_id, blockRequest.getName());
+            blockId = spaceService.createBlock(user, workspace_id, blockRequest.getName());
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest()
@@ -62,8 +63,7 @@ public class WorkspaceController {
         }
         return ResponseEntity.status(CREATED)
                 .contentType(APPLICATION_JSON)
-                // TODO: change response
-                .body("{\"status\":\"success\"}");
+                .body(new BlockResponse(blockId, blockRequest.getName(), workspace_id));
     }
 
     @PutMapping("/{workspace_id}/block/{block_id}")

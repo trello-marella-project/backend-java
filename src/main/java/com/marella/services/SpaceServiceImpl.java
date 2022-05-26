@@ -119,7 +119,6 @@ public class SpaceServiceImpl implements SpaceService{
         space.setPublic(isPublic);
     }
 
-
     @Override
     public void deleteSpaceById(User user, Long spaceId) throws IllegalArgumentException{
         Space space = findSpaceById(spaceId);
@@ -130,13 +129,15 @@ public class SpaceServiceImpl implements SpaceService{
 
     @Override
     @Transactional
-    public void createBlock(User user, Long spaceId, String name) {
+    public Long createBlock(User user, Long spaceId, String name) {
         Space space = findSpaceById(spaceId);
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
 
-        space.addBlock(new Block(name));
-        spaceRepository.save(space);
+        Block block = new Block(name);
+        space.addBlock(block);
+        updateEntranceTime(user, space);
+        return block.getId();
     }
 
     @Override
