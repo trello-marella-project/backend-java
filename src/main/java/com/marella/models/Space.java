@@ -163,7 +163,7 @@ public class Space {
                 else
                     for(Card card : block.getCards()){
                         response.append(cardPrefix);
-                        response.append(String.format("{\"card_id\":\"%s\",", card.getId()));
+                        response.append(String.format("{\"card_id\":%s,", card.getId()));
                         response.append(String.format("\"name\":\"%s\",", card.getName()));
                         response.append(String.format("\"description\":\"%s\"}", card.getDescription()));
                         cardPrefix = ",";
