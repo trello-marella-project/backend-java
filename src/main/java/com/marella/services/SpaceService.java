@@ -36,4 +36,8 @@ public interface SpaceService {
     void deleteBlock(User user, Long spaceId, Long blockId);
 
     Long createCard(User user, Long spaceId, Long blockId, String name, String description);
+
+    void updateCard(User user, Long spaceId, Long blockId, Long cardId, String name, String description);
+
+    void deleteCard(User user, Long spaceId, Long blockId, Long cardId);
 }

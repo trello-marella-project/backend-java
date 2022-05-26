@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -24,9 +25,9 @@ public class SpaceServiceImpl implements SpaceService{
     private TagRepository tagRepository;
     private PermissionRepository permissionRepository;
     private EntranceRepository entranceRepository;
-    private BlockRepository blockRepository;
 
     private BlockService blockService;
+    private CardService cardService;
 
     @Override
     public List<SpaceResponse> getUserSpacesByLimitAndPage(User user, int limit, int page) {
@@ -71,7 +72,6 @@ public class SpaceServiceImpl implements SpaceService{
             space.addPermission(new Permission(user, space));
         for(String tagName : tags)
             space.addTag(new Tag(tagName));
-//            tagRepository.findByName(tagName).ifPresentOrElse(space::addTag, () -> space.addTag(new Tag(tagName)));
 
         space.addEntrance(new Entrance(owner, space, new GregorianCalendar()));
         spaceRepository.save(space);
@@ -146,7 +146,7 @@ public class SpaceServiceImpl implements SpaceService{
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
         Block block = blockService.findBlockById(blockId);
-        int index = checkContainAtSpace(space, block, blockId);
+        int index = checkContainAtSpace(space, block);
 
         space.getBlocks().get(index).setName(name);
         updateEntranceTime(user, space);
@@ -159,7 +159,7 @@ public class SpaceServiceImpl implements SpaceService{
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
         Block block = blockService.findBlockById(blockId);
-        checkContainAtSpace(space, block, blockId);
+        checkContainAtSpace(space, block);
 
         space.removeBlock(block);
         updateEntranceTime(user, space);
@@ -172,12 +172,44 @@ public class SpaceServiceImpl implements SpaceService{
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
         Block block = blockService.findBlockById(blockId);
-        checkContainAtSpace(space, block, blockId);
+        checkContainAtSpace(space, block);
 
         Card card = new Card(name, description);
         block.addCard(card);
         updateEntranceTime(user, space);
         return card.getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateCard(User user, Long spaceId, Long blockId, Long cardId, String name, String description) {
+        Space space = findSpaceById(spaceId);
+        if(!isPermitted(user, space))
+            throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
+        Block block = blockService.findBlockById(blockId);
+        int blockIndex = checkContainAtSpace(space, block);
+        Card card = cardService.findCardById(cardId);
+        int cardIndex = checkContainAtBlock(block, card);
+
+        Card changedCard = space.getBlocks().get(blockIndex).getCards().get(cardIndex);
+        changedCard.setName(name);
+        changedCard.setDescription(description);
+        updateEntranceTime(user, space);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCard(User user, Long spaceId, Long blockId, Long cardId) {
+        Space space = findSpaceById(spaceId);
+        if(!isPermitted(user, space))
+            throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
+        Block block = blockService.findBlockById(blockId);
+        int blockIndex = checkContainAtSpace(space, block);
+        Card card = cardService.findCardById(cardId);
+        checkContainAtBlock(block, card);
+
+        space.getBlocks().get(blockIndex).removeCard(card);
+        updateEntranceTime(user, space);
     }
 
     private void updateEntranceTime(User user, Space space) {
@@ -201,10 +233,17 @@ public class SpaceServiceImpl implements SpaceService{
         return false;
     }
 
-    private int checkContainAtSpace(Space space, Block block, Long blockId) {
+    private int checkContainAtSpace(Space space, Block block) {
         List<Block> blocks = space.getBlocks();
         int index = blocks.indexOf(block);
-        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", block.getId()));
+        return index;
+    }
+
+    private int checkContainAtBlock(Block block, Card card) {
+        List<Card> cards = block.getCards();
+        int index = cards.indexOf(card);
+        if(index == -1) throw new IllegalArgumentException(String.format("block do not contains card with id: %d ", card.getId()));
         return index;
     }
 
