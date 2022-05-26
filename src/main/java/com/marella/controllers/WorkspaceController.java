@@ -9,6 +9,7 @@ import com.marella.payload.response.CardResponse;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
+import com.marella.services.UserService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class WorkspaceController {
 
     private SpaceService spaceService;
     private JwtUtils jwtUtils;
-    private UserRepository userRepository;
+    private UserService userService;
 
     @GetMapping("/{workspace_id}")
     public ResponseEntity<?> getWorkspaceById(@PathVariable Long workspace_id,
@@ -166,6 +167,6 @@ public class WorkspaceController {
     private User getUser(String authorization) {
         String token = authorization.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
-        return userRepository.findByUsername(username).get();
+        return userService.findUserByUsername(username);
     }
 }

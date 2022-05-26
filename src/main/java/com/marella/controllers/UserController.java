@@ -65,6 +65,6 @@ public class UserController {
     private User getUser(String authorization) {
         String token = authorization.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
-        return userRepository.findByUsername(username).get();
+        return userService.findUserByUsername(username);
     }
 }

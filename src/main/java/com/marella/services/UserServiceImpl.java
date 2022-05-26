@@ -14,6 +14,13 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new IllegalArgumentException(String.format("user with username: %s does not exist", username))
+        );
+    }
+
+    @Override
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(
                 () -> new IllegalArgumentException(String.format("user with email: %s does not exist", email))

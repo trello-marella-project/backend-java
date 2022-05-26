@@ -9,6 +9,7 @@ import com.marella.repositories.TagRepository;
 import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
+import com.marella.services.UserService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class SpacesController {
 
     private SpaceService spaceService;
     private JwtUtils jwtUtils;
-    private UserRepository userRepository;
+    private UserService userService;
     private TagRepository tagRepository;
 
     @GetMapping("/yours")
@@ -157,7 +158,7 @@ public class SpacesController {
     private User getUser(String authorization) {
         String token = authorization.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
-        return userRepository.findByUsername(username).get();
+        return userService.findUserByUsername(username);
     }
 
     private String ResponseRender(List<?> spaceResponses, String type) {
