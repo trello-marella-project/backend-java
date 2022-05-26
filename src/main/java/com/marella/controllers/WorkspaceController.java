@@ -148,12 +148,10 @@ public class WorkspaceController {
     public ResponseEntity<?> deleteCard(@PathVariable Long workspace_id,
                                         @PathVariable Long block_id,
                                         @PathVariable Long card_id,
-                                        @RequestBody CardRequest cardRequest,
                                         @RequestHeader(name = "Authorization") String authorization){
         User user = getUser(authorization);
         try{
-            spaceService.deleteCard(user, workspace_id, block_id, card_id,
-                    cardRequest.getName(), cardRequest.getDescription());
+            spaceService.deleteCard(user, workspace_id, block_id, card_id);
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest()
