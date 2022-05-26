@@ -26,6 +26,8 @@ public class SpaceServiceImpl implements SpaceService{
     private EntranceRepository entranceRepository;
     private BlockRepository blockRepository;
 
+    private BlockService blockService;
+
     @Override
     public List<SpaceResponse> getUserSpacesByLimitAndPage(User user, int limit, int page) {
         Pageable pageable = new OffsetBasedPageRequest(limit, limit * page);
@@ -77,9 +79,7 @@ public class SpaceServiceImpl implements SpaceService{
 
     @Override
     public Space getSpace(User user, Long spaceId) {
-        Space space = spaceRepository.findById(spaceId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
-        );
+        Space space = findSpaceById(spaceId);
         if(isPermitted(user, space)) return space;
         throw new IllegalArgumentException(String.format("forbidden to get space with id: %d", spaceId));
     }
@@ -88,9 +88,7 @@ public class SpaceServiceImpl implements SpaceService{
     @Transactional
     public void updateSpace(User owner, Long spaceId, String name, Map<String, ArrayList<Long>> members,
                             Map<String, ArrayList<String>> tags, boolean isPublic) throws IllegalArgumentException{
-        Space space = spaceRepository.findById(spaceId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
-        );
+        Space space = findSpaceById(spaceId);
         if(space.getUser() != owner)
             throw new IllegalArgumentException(String.format("forbidden to update space with id: %d", spaceId));
 
@@ -124,9 +122,7 @@ public class SpaceServiceImpl implements SpaceService{
 
     @Override
     public void deleteSpaceById(User user, Long spaceId) throws IllegalArgumentException{
-        Space space = spaceRepository.findById(spaceId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
-        );
+        Space space = findSpaceById(spaceId);
         if(space.getUser() != user)
             throw new IllegalArgumentException(String.format("forbidden to delete space with id: %d", spaceId));
         spaceRepository.delete(space);
@@ -135,9 +131,7 @@ public class SpaceServiceImpl implements SpaceService{
     @Override
     @Transactional
     public void createBlock(User user, Long spaceId, String name) {
-        Space space = spaceRepository.findById(spaceId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
-        );
+        Space space = findSpaceById(spaceId);
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
 
@@ -148,36 +142,24 @@ public class SpaceServiceImpl implements SpaceService{
     @Override
     @Transactional
     public void updateBlock(User user, Long spaceId, Long blockId, String name) {
-        Space space = spaceRepository.findById(spaceId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
-        );
+        Space space = findSpaceById(spaceId);
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
-        Block block = blockRepository.findById(blockId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
-        );
-        List<Block> blocks = space.getBlocks();
-        int index = blocks.indexOf(block);
-        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+        Block block = blockService.findBlockById(blockId);
+        int index = checkContainAtSpace(space, block, blockId);
 
-        blocks.get(index).setName(name);
+        space.getBlocks().get(index).setName(name);
         updateEntranceTime(user, space);
     }
 
     @Override
     @Transactional
     public void deleteBlock(User user, Long spaceId, Long blockId) {
-        Space space = spaceRepository.findById(spaceId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
-        );
+        Space space = findSpaceById(spaceId);
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
-        Block block = blockRepository.findById(blockId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
-        );
-        List<Block> blocks = space.getBlocks();
-        int index = blocks.indexOf(block);
-        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+        Block block = blockService.findBlockById(blockId);
+        checkContainAtSpace(space, block, blockId);
 
         space.removeBlock(block);
         updateEntranceTime(user, space);
@@ -186,17 +168,11 @@ public class SpaceServiceImpl implements SpaceService{
     @Override
     @Transactional
     public Long createCard(User user, Long spaceId, Long blockId, String name, String description) {
-        Space space = spaceRepository.findById(spaceId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
-        );
+        Space space = findSpaceById(spaceId);
         if(!isPermitted(user, space))
             throw new IllegalArgumentException(String.format("forbidden to change workspace with id: %d", spaceId));
-        Block block = blockRepository.findById(blockId).orElseThrow(
-                () -> new IllegalArgumentException(String.format("block with id: %d does not exist", blockId))
-        );
-        List<Block> blocks = space.getBlocks();
-        int index = blocks.indexOf(block);
-        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+        Block block = blockService.findBlockById(blockId);
+        checkContainAtSpace(space, block, blockId);
 
         Card card = new Card(name, description);
         block.addCard(card);
@@ -223,5 +199,18 @@ public class SpaceServiceImpl implements SpaceService{
                 return true;
         }
         return false;
+    }
+
+    private int checkContainAtSpace(Space space, Block block, Long blockId) {
+        List<Block> blocks = space.getBlocks();
+        int index = blocks.indexOf(block);
+        if(index == -1) throw new IllegalArgumentException(String.format("workspace do not contains block with id: %d ", blockId));
+        return index;
+    }
+
+    private Space findSpaceById(Long spaceId){
+        return spaceRepository.findById(spaceId).orElseThrow(
+                () -> new IllegalArgumentException(String.format("space with id: %d does not exist", spaceId))
+        );
     }
 }
