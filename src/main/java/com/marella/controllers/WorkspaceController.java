@@ -123,6 +123,48 @@ public class WorkspaceController {
                 .body(new CardResponse(cardId, block_id, cardRequest.getName()).toString());
     }
 
+    @PutMapping("/{workspace_id}/block/{block_id}/card/{card_id}")
+    public ResponseEntity<?> updateCard(@PathVariable Long workspace_id,
+                                        @PathVariable Long block_id,
+                                        @PathVariable Long card_id,
+                                        @RequestBody CardRequest cardRequest,
+                                        @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        try{
+            spaceService.updateCard(user, workspace_id, block_id, card_id,
+                    cardRequest.getName(), cardRequest.getDescription());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+        return ResponseEntity.ok()
+                .contentType(APPLICATION_JSON)
+                .body(new CardResponse(card_id, block_id, cardRequest.getName()).toString());
+    }
+
+    @DeleteMapping("/{workspace_id}/block/{block_id}/card/{card_id}")
+    public ResponseEntity<?> deleteCard(@PathVariable Long workspace_id,
+                                        @PathVariable Long block_id,
+                                        @PathVariable Long card_id,
+                                        @RequestBody CardRequest cardRequest,
+                                        @RequestHeader(name = "Authorization") String authorization){
+        User user = getUser(authorization);
+        try{
+            spaceService.deleteCard(user, workspace_id, block_id, card_id,
+                    cardRequest.getName(), cardRequest.getDescription());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+        return ResponseEntity.ok()
+                .contentType(APPLICATION_JSON)
+                .body("{\"status\":\"success\"}");
+    }
+
     private User getUser(String authorization) {
         String token = authorization.substring(7);
         String username = jwtUtils.getUserNameFromJwtToken(token);
