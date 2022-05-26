@@ -33,7 +33,7 @@ public class EmailServiceImpl implements EmailService{
 
             messageHelper.setFrom(emailAddress);
             messageHelper.setTo(to);
-            messageHelper.setSubject("Email confirmation");
+            messageHelper.setSubject("EmailRequest confirmation");
             messageHelper.setText(email);
 
             mailSender.send(mimeMessage);
