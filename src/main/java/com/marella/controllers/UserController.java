@@ -2,9 +2,9 @@ package com.marella.controllers;
 
 import com.marella.models.User;
 import com.marella.payload.request.EmailRequest;
+import com.marella.payload.request.MessageRequest;
 import com.marella.payload.response.UserGetAdminResponse;
 import com.marella.payload.response.UserGetResponse;
-import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.UserService;
 import lombok.AllArgsConstructor;
@@ -27,8 +27,6 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private JwtUtils jwtUtils;
-
-    private UserRepository userRepository;
 
     private UserService userService;
 
@@ -55,6 +53,23 @@ public class UserController {
                     .contentType(APPLICATION_JSON)
                     .body(new UserGetAdminResponse(allUsers).toString());
         } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{user_id}")
+    public ResponseEntity<?> createReport(@PathVariable Long user_id,
+                                          @RequestBody MessageRequest messageRequest,
+                                          @RequestHeader(name = "Authorization") String authorization){
+        try{
+            userService.createReport(getUser(authorization), user_id, messageRequest.getMessage());
+            return ResponseEntity.status(CREATED)
+                    .contentType(APPLICATION_JSON)
+                    .body("{\"status\":\"success\"}");
+        } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
             return ResponseEntity.badRequest()
                     .contentType(APPLICATION_JSON)
