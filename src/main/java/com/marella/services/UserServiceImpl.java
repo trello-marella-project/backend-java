@@ -68,4 +68,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public void updateBlockedStatus(User user, boolean isBlocked) {
+        user.setBlocked(isBlocked);
+        userRepository.save(user);
+    }
+
 }

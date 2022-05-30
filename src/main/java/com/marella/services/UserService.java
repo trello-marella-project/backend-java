@@ -20,4 +20,6 @@ public interface UserService {
     void updateUsername(User user, String username);
 
     void updatePassword(User user, String password);
+
+    void updateBlockedStatus(User user, boolean isBlocked);
 }

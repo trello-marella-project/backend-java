@@ -133,6 +133,17 @@ public class UserController {
         }
     }
 
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<?> updateBlockStatus(@PathVariable Long id,
+                                               @RequestBody IsBlockedRequest isBlockedRequest,
+                                               @RequestHeader(name = "Authorization") String authorization){
+        User user = userService.findUserById(id);
+        userService.updateBlockedStatus(user, isBlockedRequest.is_blocked());
+        return ResponseEntity.ok()
+                .contentType(APPLICATION_JSON)
+                .body("{\"status\":\"success\"}");
+    }
+
     private User getUser(String authorization) {
         String token = authorization.substring(7);
 //        String username = jwtUtils.getSubjectFromJwtToken(token);
