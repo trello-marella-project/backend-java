@@ -61,11 +61,17 @@ public class Report {
     public String toString() {
         return "{" +
                 "\"report_id\":" + id +
-                ",\"message\"" + message + '\"' +
+                ",\"message\":\"" + message + '\"' +
                 ",\"declarerUser\":" +
-                String.format("{%d,\"%s\",\"%s\"}", declarerUser.getId(), declarerUser.getEmail(), declarerUser.getUsername()) +
+                String.format("{\"user_id\":%d" +
+                                ",\"email\":\"%s\"" +
+                                ",\"username\":\"%s\"}",
+                        declarerUser.getId(), declarerUser.getEmail(), declarerUser.getUsername()) +
                 ",\"accusedUser\":"  +
-                String.format("{%d,\"%s\",\"%s\"}", accusedUser.getId(), accusedUser.getEmail(), accusedUser.getUsername()) +
+                String.format("{\"user_id\":%d" +
+                        ",\"email\":\"%s\"" +
+                        ",\"username\":\"%s\"}",
+                        accusedUser.getId(), accusedUser.getEmail(), accusedUser.getUsername()) +
                 "}";
     }
 }
