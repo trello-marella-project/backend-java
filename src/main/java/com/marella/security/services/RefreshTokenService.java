@@ -1,11 +1,14 @@
 package com.marella.security.services;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import com.marella.exception.TokenRefreshException;
 import com.marella.models.RefreshToken;
+import com.marella.models.User;
 import com.marella.repositories.RefreshTokenRepository;
 import com.marella.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +48,14 @@ public class RefreshTokenService {
     public RefreshToken deleteToken(RefreshToken token){
         refreshTokenRepository.delete(token);
         return token;
+    }
+    @Transactional
+    public void deleteExpiredTokensByUser(User user){
+        List<RefreshToken> tokens = refreshTokenRepository.findAllById(List.of(user.getId()));
+        for(RefreshToken token : tokens){
+            if (token.getExpiryDate().compareTo(Instant.now()) < 0){
+                refreshTokenRepository.delete(token);
+            }
+        }
     }
 }

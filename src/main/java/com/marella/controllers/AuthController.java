@@ -125,6 +125,7 @@ public class AuthController {
                 .map(user -> {
                     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
                     String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+                    refreshTokenService.deleteExpiredTokensByUser(user);
 
                     Cookie newCookie = new Cookie("refresh", refreshToken.getToken());
                     newCookie.setHttpOnly(true);
