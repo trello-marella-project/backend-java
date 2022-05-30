@@ -45,6 +45,7 @@ public class UserGetAdminResponse {
     public String toString() {
         StringBuilder response = new StringBuilder();
         String prefix = "{\"users\":[";
+        if(users.isEmpty()) response.append(prefix);
         for(TempUser user : users){
             response.append(prefix);
             response.append(user.toString());
