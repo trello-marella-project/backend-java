@@ -47,10 +47,9 @@ public class Tag {
 
     @Override
     public String toString() {
-        return "Tag{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", space=" + space +
+        return "{" +
+                "\"tag_id\":" + id +
+                ",\"name\":\"" + name + '\"' +
                 '}';
     }
 }
