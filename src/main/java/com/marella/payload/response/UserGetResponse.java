@@ -1,9 +1,9 @@
 package com.marella.payload.response;
 
 public class UserGetResponse {
-    Long userId;
-    String username;
-    String email;
+    private Long userId;
+    private String username;
+    private String email;
 
     public UserGetResponse(Long userId, String username, String email) {
         this.userId = userId;

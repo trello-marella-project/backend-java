@@ -9,10 +9,10 @@ import java.util.Map;
 @Setter
 @Getter
 public class SpaceUpdateRequest {
-    String name;
-    Map<String, ArrayList<Long>> members;
-    Map<String, ArrayList<String>> tags;
-    boolean is_public;
+    private String name;
+    private Map<String, ArrayList<Long>> members;
+    private Map<String, ArrayList<String>> tags;
+    private boolean is_public;
 
     public void setIs_public(boolean is_public) {
         this.is_public = is_public;

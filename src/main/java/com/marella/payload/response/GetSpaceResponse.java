@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetSpaceResponse {
-    Space space;
+    private Space space;
 
     @Override
     public String toString() {

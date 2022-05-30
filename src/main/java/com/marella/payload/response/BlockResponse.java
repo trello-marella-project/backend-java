@@ -8,9 +8,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class BlockResponse {
-    Long blockId;
-    String name;
-    Long spaceId;
+    private Long blockId;
+    private String name;
+    private Long spaceId;
 
     @Override
     public String toString() {

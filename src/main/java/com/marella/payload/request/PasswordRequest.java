@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PasswordRequest {
-    String password;
+    private String password;
 }

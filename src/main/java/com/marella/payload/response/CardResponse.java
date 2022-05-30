@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class CardResponse {
-    Long cardId;
-    Long blockId;
-    String name;
+    private Long cardId;
+    private Long blockId;
+    private String name;
 
     @Override
     public String toString() {

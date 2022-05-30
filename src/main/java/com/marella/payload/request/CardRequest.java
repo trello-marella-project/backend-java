@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CardRequest {
-    String name;
-    String description;
+    private String name;
+    private String description;
 }

@@ -9,5 +9,5 @@ import javax.validation.constraints.Email;
 @Setter
 public class EmailRequest {
     @Email
-    String email;
+    private String email;
 }

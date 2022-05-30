@@ -13,7 +13,7 @@ public class JwtResponse {
     private String username;
     private String email;
     private List<String> roles;
-    boolean isEnabled;
+    private boolean isEnabled;
 
     @Override
     public String toString() {

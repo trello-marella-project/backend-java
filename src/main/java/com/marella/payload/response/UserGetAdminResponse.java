@@ -9,10 +9,10 @@ import java.util.List;
 
 public class UserGetAdminResponse {
     class TempUser{
-        Long userId;
-        String username;
-        String email;
-        boolean isBlocked;
+        private Long userId;
+        private String username;
+        private String email;
+        private boolean isBlocked;
 
         public TempUser(Long userId, String username, String email, boolean isBlocked) {
             this.userId = userId;
