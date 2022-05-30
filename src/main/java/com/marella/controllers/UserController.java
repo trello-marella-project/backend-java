@@ -100,6 +100,39 @@ public class UserController {
         }
     }
 
+    @PutMapping(value = "/username")
+    public ResponseEntity<?> updateUsername(@RequestBody UsernameRequest usernameRequest,
+                                            @RequestHeader(name = "Authorization") String authorization){
+        try {
+            userService.updateUsername(getUser(authorization), usernameRequest.getUsername());
+            return ResponseEntity.ok()
+                    .contentType(APPLICATION_JSON)
+                    .body("{\"status\":\"success\"}");
+        }catch (IllegalStateException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+    }
+
+    @PutMapping(value = "/password")
+    public ResponseEntity<?> updatePassword(@RequestBody PasswordRequest passwordRequest,
+                                            @RequestHeader(name = "Authorization") String authorization){
+        try {
+            logger.info("try to change password");
+            userService.updatePassword(getUser(authorization), passwordRequest.getPassword());
+            return ResponseEntity.ok()
+                    .contentType(APPLICATION_JSON)
+                    .body("{\"status\":\"success\"}");
+        }catch (IllegalStateException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+    }
+
     private User getUser(String authorization) {
         String token = authorization.substring(7);
 //        String username = jwtUtils.getSubjectFromJwtToken(token);

@@ -4,6 +4,7 @@ import com.marella.models.Report;
 import com.marella.models.User;
 import com.marella.repositories.ReportRepository;
 import com.marella.repositories.UserRepository;
+import com.marella.security.services.RefreshTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
     private ReportRepository reportRepository;
+
+    private RefreshTokenService refreshTokenService;
 
     @Override
     public User findUserByUsername(String username) {
@@ -57,4 +60,12 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         userRepository.save(user);
     }
+
+    @Override
+    public void updatePassword(User user, String password) {
+        refreshTokenService.deleteByUser(user);
+        user.setPassword(encoder.encode(password));
+        userRepository.save(user);
+    }
+
 }
