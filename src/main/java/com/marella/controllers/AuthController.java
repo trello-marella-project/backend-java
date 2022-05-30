@@ -72,7 +72,7 @@ public class AuthController {
         logger.info("get username by email");
         String email = loginRequest.getEmail();
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("user not found with email: " + email));
 
         logger.info("authenticate");
         Authentication authentication = authenticationManager.authenticate(
@@ -84,7 +84,14 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 //        String username = userDetails.getUsername();
         if(!user.getEnabled()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Warning: Email is not activated");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .contentType(APPLICATION_JSON)
+                    .body("{\"status\":\"warning: email is not activated\"}");
+        }
+        if(user.getBlocked()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .contentType(APPLICATION_JSON)
+                    .body("{\"status\":\"warning: user is blocked\"}");
         }
 
         logger.info("create jwt");
