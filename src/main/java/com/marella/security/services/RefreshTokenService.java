@@ -1,7 +1,6 @@
 package com.marella.security.services;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,8 +40,8 @@ public class RefreshTokenService {
         return token;
     }
     @Transactional
-    public int deleteByUser(User user) {
-        return refreshTokenRepository.deleteByUser(user);
+    public void deleteByUser(User user) {
+        refreshTokenRepository.deleteByUser(user);
     }
     @Transactional
     public RefreshToken deleteToken(RefreshToken token){
