@@ -6,7 +6,6 @@ import com.marella.payload.request.SpaceCreationRequest;
 import com.marella.payload.request.SpaceUpdateRequest;
 import com.marella.payload.response.GetSpaceResponse;
 import com.marella.repositories.TagRepository;
-import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
 import com.marella.services.UserService;
@@ -157,8 +156,10 @@ public class SpacesController {
 
     private User getUser(String authorization) {
         String token = authorization.substring(7);
-        String username = jwtUtils.getUserNameFromJwtToken(token);
-        return userService.findUserByUsername(username);
+//        String username = jwtUtils.getSubjectFromJwtToken(token);
+//        return userService.findUserByUsername(username);
+        Long id = Long.valueOf(jwtUtils.getSubjectFromJwtToken(token));
+        return userService.findUserById(id);
     }
 
     private String ResponseRender(List<?> spaceResponses, String type) {

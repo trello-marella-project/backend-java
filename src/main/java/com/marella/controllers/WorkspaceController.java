@@ -6,7 +6,6 @@ import com.marella.payload.request.BlockRequest;
 import com.marella.payload.request.CardRequest;
 import com.marella.payload.response.BlockResponse;
 import com.marella.payload.response.CardResponse;
-import com.marella.repositories.UserRepository;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.SpaceService;
 import com.marella.services.UserService;
@@ -166,7 +165,9 @@ public class WorkspaceController {
 
     private User getUser(String authorization) {
         String token = authorization.substring(7);
-        String username = jwtUtils.getUserNameFromJwtToken(token);
-        return userService.findUserByUsername(username);
+//        String username = jwtUtils.getSubjectFromJwtToken(token);
+//        return userService.findUserByUsername(username);
+        Long id = Long.valueOf(jwtUtils.getSubjectFromJwtToken(token));
+        return userService.findUserById(id);
     }
 }

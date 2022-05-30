@@ -1,21 +1,17 @@
 package com.marella.controllers;
 
 import com.marella.models.User;
-import com.marella.payload.request.EmailRequest;
-import com.marella.payload.request.MessageRequest;
-import com.marella.payload.request.UploadFileRequest;
+import com.marella.payload.request.*;
 import com.marella.payload.response.UserGetAdminResponse;
 import com.marella.payload.response.UserGetResponse;
 import com.marella.security.jwt.JwtUtils;
 import com.marella.services.UserService;
 import com.marella.utils.FileUtils;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -86,7 +82,6 @@ public class UserController {
 
     @PostMapping(value = "/photo", consumes = {MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> uploadPhoto(@ModelAttribute UploadFileRequest uploadFileRequest,
-//    public ResponseEntity<?> uploadPhoto(@ModelAttribute @RequestPart MultipartFile document,
                                          @RequestHeader(name = "Authorization") String authorization){
         logger.info("file received");
         String localPath="D:/Семен/УЧЕБА/Курс 3/Marella/src/main/resources/static";
@@ -107,7 +102,9 @@ public class UserController {
 
     private User getUser(String authorization) {
         String token = authorization.substring(7);
-        String username = jwtUtils.getUserNameFromJwtToken(token);
-        return userService.findUserByUsername(username);
+//        String username = jwtUtils.getSubjectFromJwtToken(token);
+//        return userService.findUserByUsername(username);
+        Long id = Long.valueOf(jwtUtils.getSubjectFromJwtToken(token));
+        return userService.findUserById(id);
     }
 }

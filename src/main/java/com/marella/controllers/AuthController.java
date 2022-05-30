@@ -82,13 +82,14 @@ public class AuthController {
         // is user enabled TODO: set as filter
         logger.info("get details");
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String username = userDetails.getUsername();
-        if(!userRepository.findByUsername(username).get().getEnabled()){
+//        String username = userDetails.getUsername();
+        if(!user.getEnabled()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Warning: Email is not activated");
         }
 
         logger.info("create jwt");
-        String jwt = jwtUtils.generateTokenFromUsername(username);
+//        String jwt = jwtUtils.generateTokenFromUsername(username);
+        String jwt = jwtUtils.generateTokenFromUserId(user.getId());
         logger.info("get roles");
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
@@ -124,7 +125,8 @@ public class AuthController {
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-                    String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+//                    String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+                    String token = jwtUtils.generateTokenFromUserId(user.getId());
                     refreshTokenService.deleteExpiredTokensByUser(user);
 
                     Cookie newCookie = new Cookie("refresh", refreshToken.getToken());
