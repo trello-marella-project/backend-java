@@ -2,6 +2,7 @@ package com.marella.controllers;
 
 import com.marella.models.Space;
 import com.marella.models.User;
+import com.marella.payload.SpaceSearch;
 import com.marella.payload.request.SpaceCreationRequest;
 import com.marella.payload.request.SpaceUpdateRequest;
 import com.marella.payload.response.GetSpaceResponse;
@@ -65,17 +66,18 @@ public class SpacesController {
                 .body(ResponseRender(spaceService.getUserRecentSpacesByLimitAndPage(user, limit, page), "spaces"));
     }
 
-    // TODO: correct parameters of request
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<?> userFindSpaces(@RequestParam("limit") int limit,
                                             @RequestParam("page") int page,
-                                            @RequestParam("tags_id") List<Long> tags_id,
+                                            @RequestParam("tags") List<String> tags,
                                             @RequestParam("search") String search,
                                             @RequestHeader(name = "Authorization") String authorization) {
         User user = getUser(authorization);
+        List<Space> spaces = spaceService.getSearch(user, limit, page, tags, search);
+        SpaceSearch spaceSearch = new SpaceSearch(spaces);
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
-                .body(ResponseRender(spaceService.getSearch(user, limit, page, tags_id, search), "spaces"));
+                .body(spaceSearch.toString());
     }
 
     @PostMapping()

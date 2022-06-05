@@ -18,7 +18,7 @@ public interface SpaceService {
 
     List<SpaceResponse> getUserRecentSpacesByLimitAndPage(User user, int limit, int page);
 
-    List<SpaceSearch> getSearch(User user, int limit, int page, List<Long> tags_id, String search);
+    List<Space> getSearch(User user, int limit, int page, List<String> tags, String search);
 
     void createSpace(User owner, String name, List<Long> members, List<String> tags, boolean isPublic);
 

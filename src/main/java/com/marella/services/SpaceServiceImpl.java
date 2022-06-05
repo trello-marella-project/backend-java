@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -48,11 +47,49 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
-    public List<SpaceSearch> getSearch(User user, int limit, int page, List<Long> tags_id, String search) {
-//        TODO: customize searching process
-//        TODO: customize request to DB
-        Pageable pageable = new OffsetBasedPageRequest(limit, limit * page);
-        return spaceRepository.findSpaces(user.getId(), tags_id, search, pageable);
+    public List<Space> getSearch(User user, int limit, int page, List<String> tags, String search) {
+        List<Space> spaces;
+        List<Tag> convertedTags = new ArrayList<>();
+        for(String name : tags) convertedTags.add(new Tag(name));
+
+        List<Space> userSpaces = spaceRepository.findUserSpaces(user.getId(), "%" + search + "%");
+        spaces = compareTags(userSpaces, convertedTags);
+        if(spaces.size() < limit * (1 + page)){
+            List<Space> permittedSpaces = spaceRepository.findPermittedSpaces(user.getId(), "%" + search + "%");
+            spaces.addAll(compareTags(permittedSpaces, convertedTags));
+            if(spaces.size() < limit * (1 + page)){
+                List<Space> publicSpaces = spaceRepository.findPublicSpaces(user.getId(),"%" + search + "%");
+                spaces.addAll(compareTags(publicSpaces, convertedTags));
+            }
+        }
+
+        if(spaces.size() < limit * page) return new ArrayList<>();
+        int edge = Math.min(spaces.size(), limit * (1 + page));
+
+        List<Space> response = new ArrayList<>();
+        for (int i = page * limit; i < edge; i++) response.add(spaces.get(i));
+        return response;
+    }
+
+    private List<Space> compareTags(List<Space> spaces, List<Tag> tags) {
+        List<Space> response = new ArrayList<>();
+        spaces.sort(Comparator.comparing(Space::getName));
+        for (Space space : spaces) {
+            List<Tag> sTags = space.getTags();
+            if (sTags.size() >= tags.size()) {
+                if(tags.size() == 0){
+                    response.add(space);
+                    continue;
+                }
+                for (int i = 0; i < tags.size(); i++) {
+                    if (!sTags.contains(tags.get(i)))
+                        break;
+                    if (tags.size() == i + 1)
+                        response.add(space);
+                }
+            }
+        }
+        return response;
     }
 
     @Override
