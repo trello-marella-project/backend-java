@@ -147,12 +147,28 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        Optional<User> dbuser = userRepository.findByUsername(signUpRequest.getUsername());
+        if (dbuser.isPresent()) {
+            if(!dbuser.get().getEnabled()){
+                Optional<ActivationToken> token = activationTokenRepository.findByUser(dbuser.get());
+                if(token.isPresent()) {
+                    emailService.send(dbuser.get().getEmail(), "https://marella-api.herokuapp.com/api/auth/activate/" + token.get());
+                    return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
+                }
+            }
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        dbuser = userRepository.findByEmail(signUpRequest.getUsername());
+        if (dbuser.isPresent()) {
+            if(!dbuser.get().getEnabled()){
+                Optional<ActivationToken> token = activationTokenRepository.findByUser(dbuser.get());
+                if(token.isPresent()) {
+                    emailService.send(dbuser.get().getEmail(), "https://marella-api.herokuapp.com/api/auth/activate/" + token.get());
+                    return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
+                }
+            }
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Email is already in use!"));
@@ -166,11 +182,12 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         roles.add(userRole);
         user.setRoles(roles);
-        userRepository.save(user);
 
         ActivationToken activationToken = new ActivationToken(UUID.randomUUID().toString(), user);
+        emailService.send(user.getEmail(), "https://marella-api.herokuapp.com/api/auth/activate/" + activationToken.getToken());
+
+        userRepository.save(user);
         activationTokenRepository.save(activationToken);
-        emailService.send(user.getEmail(), "http://localhost:8080/api/auth/activate/" + activationToken.getToken());
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
