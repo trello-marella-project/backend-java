@@ -160,7 +160,7 @@ public class AuthController {
                     .badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
-        dbuser = userRepository.findByEmail(signUpRequest.getUsername());
+        dbuser = userRepository.findByEmail(signUpRequest.getEmail());
         if (dbuser.isPresent()) {
             if(!dbuser.get().getEnabled()){
                 Optional<ActivationToken> token = activationTokenRepository.findByUser(dbuser.get());
