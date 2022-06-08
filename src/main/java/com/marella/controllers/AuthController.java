@@ -152,7 +152,8 @@ public class AuthController {
             if(!dbuser.get().getEnabled()){
                 Optional<ActivationToken> token = activationTokenRepository.findByUser(dbuser.get());
                 if(token.isPresent()) {
-                    emailService.send(dbuser.get().getEmail(), "https://marella-api.herokuapp.com/api/auth/activate/" + token.get());
+                    emailService.send(dbuser.get().getEmail(),
+                            "https://marella-api.herokuapp.com/api/auth/activate/" + token.get().getToken());
                     return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
                 }
             }
@@ -165,7 +166,8 @@ public class AuthController {
             if(!dbuser.get().getEnabled()){
                 Optional<ActivationToken> token = activationTokenRepository.findByUser(dbuser.get());
                 if(token.isPresent()) {
-                    emailService.send(dbuser.get().getEmail(), "https://marella-api.herokuapp.com/api/auth/activate/" + token.get());
+                    emailService.send(dbuser.get().getEmail(),
+                            "https://marella-api.herokuapp.com/api/auth/activate/" + token.get().getToken());
                     return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
                 }
             }
