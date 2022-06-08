@@ -97,7 +97,9 @@ public class SpacesController {
                     spaceCreationRequest.is_public());
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.CREATED).contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
     }
@@ -111,7 +113,9 @@ public class SpacesController {
             space = spaceService.getSpace(user, spaceId);
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
         }
         return ResponseEntity.ok().contentType(APPLICATION_JSON).body(new GetSpaceResponse(space).toString());
     }
@@ -131,7 +135,9 @@ public class SpacesController {
                     spaceUpdateRequest.is_public());
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
         }
         return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
     }
@@ -144,7 +150,9 @@ public class SpacesController {
             spaceService.deleteSpaceById(user, spaceId);
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
         }
         return ResponseEntity.ok().contentType(APPLICATION_JSON).body("{\"status\":\"success\"}");
     }
