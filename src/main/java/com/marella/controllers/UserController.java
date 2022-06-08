@@ -84,7 +84,11 @@ public class UserController {
     public ResponseEntity<?> uploadPhoto(@ModelAttribute UploadFileRequest uploadFileRequest,
                                          @RequestHeader(name = "Authorization") String authorization){
         logger.info("file received");
-        String localPath="D:/Семен/УЧЕБА/Курс 3/Marella/src/main/resources/static";
+//        String localPath = "D:/Семен/УЧЕБА/Курс 3/Marella/src/main/resources/static";
+        String localPath = String.valueOf(UserController.class.getResource(""));
+        logger.info(localPath);
+        localPath = localPath.substring(5, localPath.length() - 49);
+        localPath += "\\resources\\static";
         String filename = getUser(authorization).getUsername();
         try {
             FileUtils.upload(uploadFileRequest.getFile(), localPath, filename + ".jpeg");
