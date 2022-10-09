@@ -2,6 +2,7 @@ package com.marella.controllers;
 
 import com.marella.models.User;
 import com.marella.payload.request.*;
+import com.marella.payload.response.OwnUserGetResponse;
 import com.marella.payload.response.UserGetAdminResponse;
 import com.marella.payload.response.UserGetResponse;
 import com.marella.security.jwt.JwtUtils;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import java.io.IOException;
@@ -40,6 +42,24 @@ public class UserController {
             return ResponseEntity.ok()
                     .contentType(APPLICATION_JSON)
                     .body(new UserGetResponse(user.getId(), user.getUsername(), user.getEmail()).toString());
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .contentType(APPLICATION_JSON)
+                    .body(String.format("{\"status\":\"Error: %s\"}", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getOwnUser(HttpServletRequest request){
+        try{
+            String authorization = request.getHeader("Authorization");
+            User user = getUser(authorization);
+            return ResponseEntity.ok()
+                    .contentType(APPLICATION_JSON)
+                    .body(new OwnUserGetResponse(
+                            user.getUsername(), user.getEmail(), user.getRoles(), user.getEnabled()
+                    ).toString());
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             return ResponseEntity.badRequest()
