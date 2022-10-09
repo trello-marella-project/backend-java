@@ -23,7 +23,7 @@ public class OwnUserGetResponse {
         return "{" +
                 "\"username\":\"" + username + '\"' +
                 ",\"email\":\"" + email + '\"' +
-                ",\"role\":\"" + roles.get(0) + '\"' +
+                ",\"role\":\"" + roles.get(0).getName()+ '\"' +
                 ",\"isEnabled\":" + isEnabled +
                 '}';
     }
