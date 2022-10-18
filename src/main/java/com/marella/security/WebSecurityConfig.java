@@ -1,5 +1,8 @@
 package com.marella.security;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.marella.security.jwt.AuthEntryPointJwt;
 import com.marella.security.jwt.AuthTokenFilter;
 import com.marella.security.services.UserDetailsServiceImpl;
@@ -16,7 +19,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -45,10 +51,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http.cors().configurationSource(request -> corsConfiguration()).and().build();
+    }
+
+    public CorsConfiguration corsConfiguration(){
+        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        return configuration;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//        http.cors();
-        http.csrf().disable().cors().and()
+        http.csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/api/auth/**").permitAll()
