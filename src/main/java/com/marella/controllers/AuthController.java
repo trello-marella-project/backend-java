@@ -110,7 +110,7 @@ public class AuthController {
 //        cookie.setSecure(true);
         response.addCookie(cookie);
         response.setHeader("Set-Cookie", String.format(
-                "refresh=%s; Secure; Path:/; SameSite=None", refreshToken.getToken())
+                "refresh=%s; Secure; Path:/; HttpOnly; SameSite=None", refreshToken.getToken())
         );
         logger.info("return response");
         return ResponseEntity.ok()
@@ -145,7 +145,7 @@ public class AuthController {
 //                    newCookie.setSecure(true);
                     response.addCookie(newCookie);
                     response.setHeader("Set-Cookie", String.format(
-                            "refresh=%s; Secure; Path:/; SameSite=None", refreshToken.getToken())
+                            "refresh=%s; Secure; Path:/; HttpOnly; SameSite=None", refreshToken.getToken())
                     );
                     return ResponseEntity.ok(new TokenRefreshResponse(token, refreshToken.getToken()));
                 })
