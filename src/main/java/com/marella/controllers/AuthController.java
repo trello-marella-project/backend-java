@@ -16,11 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -99,15 +99,16 @@ public class AuthController {
         String jwt = jwtUtils.generateTokenFromUserId(user.getId());
         logger.info("get roles");
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         logger.info("create refresh");
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
         logger.info("set cookies");
         // constructing response
         Cookie cookie = new Cookie("refresh", refreshToken.getToken());
-//        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
+        response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=None");
         logger.info("return response");
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
@@ -137,8 +138,9 @@ public class AuthController {
                     refreshTokenService.deleteExpiredTokensByUser(user);
 
                     Cookie newCookie = new Cookie("refresh", refreshToken.getToken());
-//                    newCookie.setHttpOnly(true);
+                    newCookie.setHttpOnly(true);
                     response.addCookie(newCookie);
+                    response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=None");
                     return ResponseEntity.ok(new TokenRefreshResponse(token, refreshToken.getToken()));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
