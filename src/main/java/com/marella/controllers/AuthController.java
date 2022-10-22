@@ -109,7 +109,9 @@ public class AuthController {
 //        cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         response.addCookie(cookie);
-        response.setHeader("Set-Cookie", "key=value; Secure; Path:\"/\"; SameSite=None");
+        response.setHeader("Set-Cookie", String.format(
+                "refresh=%s; Secure; Path:/; SameSite=None", refreshToken.getToken())
+        );
         logger.info("return response");
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
@@ -142,7 +144,9 @@ public class AuthController {
 //                    newCookie.setHttpOnly(true);
 //                    newCookie.setSecure(true);
                     response.addCookie(newCookie);
-                    response.setHeader("Set-Cookie", "key=value; Secure; Path:\"/\"; SameSite=None");
+                    response.setHeader("Set-Cookie", String.format(
+                            "refresh=%s; Secure; Path:/; SameSite=None", refreshToken.getToken())
+                    );
                     return ResponseEntity.ok(new TokenRefreshResponse(token, refreshToken.getToken()));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
