@@ -52,22 +52,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.cors().configurationSource(request -> corsConfiguration()).and().build();
-    }
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        return http.cors().configurationSource(request -> corsConfiguration()).and().build();
+//    }
 
-    public CorsConfiguration corsConfiguration(){
-        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        return configuration;
-    }
+//    public CorsConfiguration corsConfiguration(){
+//        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+//        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+//        configuration.setAllowCredentials(true);
+//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+//        return configuration;
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/api/auth/**").permitAll()

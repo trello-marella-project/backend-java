@@ -106,7 +106,7 @@ public class AuthController {
         logger.info("set cookies");
         // constructing response
         Cookie cookie = new Cookie("refresh", refreshToken.getToken());
-        cookie.setHttpOnly(true);
+//        cookie.setHttpOnly(true);
         response.addCookie(cookie);
         logger.info("return response");
         return ResponseEntity.ok()
@@ -137,7 +137,7 @@ public class AuthController {
                     refreshTokenService.deleteExpiredTokensByUser(user);
 
                     Cookie newCookie = new Cookie("refresh", refreshToken.getToken());
-                    newCookie.setHttpOnly(true);
+//                    newCookie.setHttpOnly(true);
                     response.addCookie(newCookie);
                     return ResponseEntity.ok(new TokenRefreshResponse(token, refreshToken.getToken()));
                 })
