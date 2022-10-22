@@ -1,5 +1,7 @@
 package com.marella.security;
 
+import java.util.Collections;
+
 import com.marella.security.jwt.AuthEntryPointJwt;
 import com.marella.security.jwt.AuthTokenFilter;
 import com.marella.security.services.UserDetailsServiceImpl;
@@ -55,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public CorsConfiguration corsConfiguration(){
         CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-//        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
         configuration.setAllowCredentials(true);
 //        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         return configuration;
