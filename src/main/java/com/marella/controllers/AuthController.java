@@ -106,10 +106,10 @@ public class AuthController {
         logger.info("set cookies");
         // constructing response
         Cookie cookie = new Cookie("refresh", refreshToken.getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
         response.addCookie(cookie);
-        response.setHeader("Set-Cookie", "key=value; HttpOnly; Secure; SameSite=None");
+        response.setHeader("Set-Cookie", "key=value; Secure; SameSite=None");
         logger.info("return response");
         return ResponseEntity.ok()
                 .contentType(APPLICATION_JSON)
@@ -139,10 +139,10 @@ public class AuthController {
                     refreshTokenService.deleteExpiredTokensByUser(user);
 
                     Cookie newCookie = new Cookie("refresh", refreshToken.getToken());
-                    newCookie.setHttpOnly(true);
-                    newCookie.setSecure(true);
+//                    newCookie.setHttpOnly(true);
+//                    newCookie.setSecure(true);
                     response.addCookie(newCookie);
-                    response.setHeader("Set-Cookie", "key=value; HttpOnly; Secure; SameSite=None");
+                    response.setHeader("Set-Cookie", "key=value; Secure; SameSite=None");
                     return ResponseEntity.ok(new TokenRefreshResponse(token, refreshToken.getToken()));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
